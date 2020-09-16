@@ -1,0 +1,96 @@
+use byggis;
+use std::env;
+use byggis::ByggisErrors;
+use termion::*;
+
+mod creator;
+mod runner;
+mod helper;
+
+#[tokio::main]
+async fn main() {
+    let mut args: Vec<String> = env::args().rev().collect();
+    
+    // get rid of file name
+    args.pop();
+
+    // pop things off the args vector untill it is empty then act on that 
+
+    // pop the rightmost element in args, if there is none (e.g args.len == 0)
+    // it will default to "help" which will later show the help command
+    // lowercases input for normalization purposes
+    let command: String = args.pop()
+        .unwrap_or("help".to_string())
+        .to_lowercase();
+    
+
+    match command.as_str() {
+        "run" => {
+            // maybe accept name of file to run as input
+            // default to main.something
+
+            let r = runner::run_tests();
+            match r {
+                Ok(_) => {
+                    println!("   Tests completed.");
+                },
+                Err(ByggisErrors::ByggisFileNotFound) => {
+                    println!("   Error: Could not find byggis file in folder");
+                    println!("   Did you run \"byggis new 'name'\"?");
+                },
+                Err(ByggisErrors::TestsNotFound) => {
+                    println!("   Error: Could not find tests in byggis file");
+                },
+                Err(ByggisErrors::MainNotFound) => {
+                    println!("   Error: Could not find a main file to test with");
+                },
+                _ => {}
+            }
+
+
+        },
+        "new" => {
+            if args.len() > 0 {
+                let r = creator::create_new(args.pop().unwrap()).await;
+                
+                match r {
+                    Ok(n) => {
+                        println!("   {}Created{} new byggis folder {}\"{}\"{}", 
+                            color::Fg(color::Green), 
+                            color::Fg(color::Reset),
+                            style::Bold,
+                            n,
+                            style::Reset);
+                    },
+                    Err(ByggisErrors::NetworkError) => {
+                        println!("   {}Error{}: Could not connect to open.kattis.com",
+                            color::Fg(color::Red),
+                            color::Fg(color::Reset));
+                    },
+                    Err(ByggisErrors::ProblemNotFound) => {
+                        println!("   {}Error{}: Could not find that problem on kattis",
+                            color::Fg(color::Red),
+                            color::Fg(color::Reset));
+                    },
+                    Err(ByggisErrors::DirectoryNotCreated) => {
+                        println!("   {}Error{}: Director could not be created",
+                            color::Fg(color::Red),
+                            color::Fg(color::Reset));
+                    },
+                    Err(ByggisErrors::ByggisFileNotCreated) => {
+                        println!("   {}Error{}: byggis file could not be created",
+                            color::Fg(color::Red),
+                            color::Fg(color::Reset));
+                    },
+                    _ => {}
+                }
+            } else {
+                helper::show_help(helper::HelpTypes::New);
+            }
+
+        },
+        _ => {
+            helper::show_help(helper::HelpTypes::Program);
+        }
+    }
+}
