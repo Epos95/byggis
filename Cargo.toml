@@ -1,6 +1,6 @@
 [package]
 name = "byggis"
-version = "0.1.0"
+version = "0.2.1"
 authors = ["epos95 <max.agnesund95@gmail.com>"]
 license = "MIT"
 description = "A build system for kattis problem solving challenges"

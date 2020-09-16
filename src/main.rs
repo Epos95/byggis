@@ -14,10 +14,8 @@ async fn main() {
     // get rid of file name
     args.pop();
 
-    // pop things off the args vector untill it is empty then act on that 
-
     // pop the rightmost element in args, if there is none (e.g args.len == 0)
-    // it will default to "help" which will later show the help command
+    // it will default to "help" which will show the help command
     // lowercases input for normalization purposes
     let command: String = args.pop()
         .unwrap_or("help".to_string())
@@ -29,20 +27,27 @@ async fn main() {
             // maybe accept name of file to run as input
             // default to main.something
 
+            // TODO: maybe solve multiple main files
             let r = runner::run_tests();
             match r {
                 Ok(_) => {
                     println!("   Tests completed.");
                 },
                 Err(ByggisErrors::ByggisFileNotFound) => {
-                    println!("   Error: Could not find byggis file in folder");
-                    println!("   Did you run \"byggis new 'name'\"?");
+                    println!("   {}Error{}: Could not find byggis file in folder",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
+                    println!("    Did you run \"byggis new 'name'\"?");
                 },
                 Err(ByggisErrors::TestsNotFound) => {
-                    println!("   Error: Could not find tests in byggis file");
+                    println!("   {}Error{}: Could not find tests in byggis file",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
                 },
                 Err(ByggisErrors::MainNotFound) => {
-                    println!("   Error: Could not find a main file to test with");
+                    println!("   {}Error{}: Could not find a main file to test with",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
                 },
                 _ => {}
             }
