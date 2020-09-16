@@ -31,6 +31,8 @@ $ byggis run
 ```
 
 ## TODO
+- [ ] beskrivning av problem från kattis
+- [ ] bättre hjälp meddelanden
 - [ ] Fler språk
 
 # Bidra
