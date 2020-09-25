@@ -3,9 +3,9 @@
 Byggis är ett verktyg för att lättare lösa [kattis](https://open.kattis.com) problem.
 
 ## Installation
-Bygg från scratch via Github eller ladda ner via cargo. (TODO)
+Bygg från scratch via Github eller ladda ner via cargo. 
 ```bash
-cargo install byggis
+$ cargo install byggis
 ```
 ## Användning 
 
@@ -15,22 +15,24 @@ Skapa en ny mapp för ditt problem och ladda ner tests
 
 Skapa en ny mapp för ditt problem och ladda ner tests från Kattis.
 ```bash
-byggis new {namn på problem}
+$ byggis new {namn på problem}
 ```
 
 Skapa manuellt en main.* fil att skriva din kod i.
 ```bash
-touch main.{extension}
+$ touch main.{extension}
 ```
 Stöda språk:
 * Python
 
 För att sedan testa din kod mot de tests på hemsidan för ditt problem.
 ```bash
-byggis run
+$ byggis run
 ```
 
 ## TODO
+- [ ] beskrivning av problem från kattis
+- [ ] bättre hjälp meddelanden
 - [ ] Fler språk
 
 # Bidra
