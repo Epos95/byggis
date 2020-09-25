@@ -24,6 +24,7 @@ $ touch main.{extension}
 ```
 Stöda språk:
 * Python
+* Rust
 
 För att sedan testa din kod mot de tests på hemsidan för ditt problem.
 ```bash
