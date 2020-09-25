@@ -37,7 +37,7 @@ $ byggis run
 - [ ] Fler språk
 
 # Bidra
-Just nu är det enda stödda språket Python. Om ditt föredragna språk inte stöds, bidra gärna genom att kontakta mig för mer information.
+Just nu är de enda stödda språken Python och Rust. Om ditt föredragna språk inte stöds, bidra gärna genom att kontakta mig för mer information.
 
 # Licens
 [MIT](https://choosealicense.com/licenses/mit/)
