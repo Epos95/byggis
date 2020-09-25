@@ -49,6 +49,19 @@ async fn main() {
                         color::Fg(color::Red),
                         color::Fg(color::Reset));
                 },
+                Err(ByggisErrors::UnknownLanguage) => {
+                    println!("   {}Error{}: Language not implemented",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
+                },
+                Err(ByggisErrors::CompileTimeError(e)) => {
+                    println!("     Compilation error:");
+                    
+                    for line in e.trim().split("\n") {
+                        println!("      {}{}{}", style::Bold, line, style::Reset);
+                    }
+                    println!("");
+                },
                 _ => {}
             }
 

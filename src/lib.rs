@@ -7,6 +7,10 @@ pub enum ByggisErrors {
     ByggisFileNotFound,
     TestsNotFound,
     MainNotFound,
+    CompileTimeError(String),
+    UnknownLanguage
 }
+
+
 
 
