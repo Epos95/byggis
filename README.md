@@ -1,43 +1,41 @@
-# Build tool för Kattis
+# Build tool for Kattis
 
-Byggis är ett verktyg för att lättare lösa [kattis](https://open.kattis.com) problem.
+Byggis is a tool to make solving [kattis](https://open.kattis.com) problems easier through your terminal and a proper testing system.
 
 ## Installation
-Bygg från scratch via Github eller ladda ner via cargo. 
+Build from scratch via GitHub or download with cargo.
 ```bash
 $ cargo install byggis
 ```
-## Användning 
 
-Skapa en ny mapp för ditt problem och ladda ner tests
-
-## Användning 
-
-Skapa en ny mapp för ditt problem och ladda ner tests från Kattis.
+## Usage 
+Create a new folder for your problem and download the test cases from Kattis.
 ```bash
 $ byggis new {namn på problem}
 ```
 
-Skapa manuellt en main.* fil att skriva din kod i.
+Manually create a main file to keep the code in.
 ```bash
 $ touch main.{extension}
 ```
-Stöda språk:
+Supported languages:
 * Python
 * Rust
 
-För att sedan testa din kod mot de tests på hemsidan för ditt problem.
+To test your code from main.* against the test cases from kattis
 ```bash
 $ byggis run
 ```
 
 ## TODO
-- [ ] beskrivning av problem från kattis
-- [ ] bättre hjälp meddelanden
-- [ ] Fler språk
+- [x] Implement rust
+- [ ] Description of the problem from Kattis
+- [ ] Better help messages
+- [ ] Implement C
+- [ ] Implement C++
 
-# Bidra
-Just nu är de enda stödda språken Python och Rust. Om ditt föredragna språk inte stöds, bidra gärna genom att kontakta mig för mer information.
+# Contribute
+Currently the only supported languages are python and Rust. If your preffered language is not supported, please contact me for more information etc.
 
 # Licens
 [MIT](https://choosealicense.com/licenses/mit/)
