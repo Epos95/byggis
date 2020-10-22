@@ -21,6 +21,7 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
         }
     }
 
+    // FIX THIS DONT USE UNWRAP
     let html = op.unwrap().text().await.unwrap();
     let document = Document::from(html.as_str());
     let hmap = get_samples(document);
