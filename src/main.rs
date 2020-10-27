@@ -6,6 +6,7 @@ use termion::*;
 mod creator;
 mod runner;
 mod helper;
+mod submitter;
 
 #[tokio::main]
 async fn main() {
@@ -107,6 +108,52 @@ async fn main() {
             }
 
         },
+        "commit" => {
+            // run commit code here
+            // should commit have any args?
+            // dont think so 
+
+            // read problem name from directory
+            let path = match args.pop() {
+                Some(s) => s,
+                _ => "~/.kattisrc".to_string()
+            };
+
+            let r = submitter::commit(path);
+
+            match r {
+                // we dont need to return anything in the ok
+                Ok(_) => {
+                    println!("Success!")
+                },
+                Err(ByggisErrors::NetworkError) => {
+                    println!("   {}Error{}: Could not connect to open.kattis.com",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
+                },
+                Err(ByggisErrors::MainNotFound) => {
+                    println!("   {}Error{}: Could not find a main file to test with",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
+                },
+                Err(ByggisErrors::ConfigFileNotFound) => {
+                    println!("   {}Error{}: Could not find config file containing token\n\tYou can generate one with {}\"byggis generate\"{}",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset),
+                        style::Bold,
+                        style::Reset);
+                },
+                Err(ByggisErrors::InvalidToken) => {
+                    println!("   {}Error{}: Invalid token",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
+                },
+                _ => {
+                    panic!("Unimplemented error");
+                }
+            }
+
+        }
         _ => {
             helper::show_help(helper::HelpTypes::Program);
         }

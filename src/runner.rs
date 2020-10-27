@@ -17,8 +17,19 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
         Err(_) => { return Err(ByggisErrors::ByggisFileNotFound); },
     };
 
-
     // reads and error handles tests from .byggis file
+    // TODO: rewrite how the hashmap is designed to be something akin to:
+    //      {
+    //           test_inputs : {
+    //               []
+    //           },
+    //           test_outputs : {
+    //                []
+    //           },
+    //       }
+    // to let this serialize well with serde we should prolly serialize it into 
+    // a custom struct, however this is not necesary until we work on commiting
+    // The DotByggis struct in lib.rs can be used for this 
     let tests: HashMap<String, String> = match serde_json::from_reader(dot_byggis) {
         Ok(n) => n,
         Err(_) => { return Err(ByggisErrors::TestsNotFound); },
@@ -170,6 +181,9 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             println!("    Test: {}failed{}", color::Fg(color::Red), color::Fg(color::Reset));
 
             // handle runtime errors and pretty print them
+            //  NOTE: This does not get handled by main.rs since its a 
+            //        recoverable error, e.g we still want the program to finish 
+            //        safely after this happens
             if String::from_utf8_lossy(&o.as_ref().unwrap().stderr).trim() != "" {
 
                 println!("     Error:");
