@@ -19,6 +19,7 @@ pub fn commit(path: String) -> Result<(), ByggisErrors> {
 
     // efter detta har vi ett (antagligen) giltigt token att använda
 
+    
 
 
 
@@ -29,6 +30,7 @@ pub fn commit(path: String) -> Result<(), ByggisErrors> {
 // be användaren om namnet på problemet om det misslyckas att läsa från directory
 fn get_problem_name() -> Option<String> {
     // should return the directory name 
+
     let o = match Command::new("pwd").output() {
         Ok(n) => {
             String::from_utf8_lossy(&n.stdout).to_string()
