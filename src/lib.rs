@@ -21,6 +21,9 @@ pub enum ByggisErrors {
         // scenario where byggis cannot find a config file to read token from
     InvalidToken,
         // scenario where kattis refuses the given token
+    FileReadingError,
+        // scenario where byggis cannot read from the token file
+
 }
 
 
@@ -31,4 +34,10 @@ pub struct DotByggis {
 }
 
 
+// call this method from main cuz fuck testing 
+// this is where we should play arond with select a bit more
+use select::*;
+pub async fn test_select() {
 
+
+}

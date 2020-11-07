@@ -30,6 +30,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
     // to let this serialize well with serde we should prolly serialize it into 
     // a custom struct, however this is not necesary until we work on commiting
     // The DotByggis struct in lib.rs can be used for this 
+
     let tests: HashMap<String, String> = match serde_json::from_reader(dot_byggis) {
         Ok(n) => n,
         Err(_) => { return Err(ByggisErrors::TestsNotFound); },

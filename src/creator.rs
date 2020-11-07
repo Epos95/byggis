@@ -40,6 +40,8 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
         return Err(ByggisErrors::ByggisFileNotCreated);
     }
 
+    // maybe ask user if they want to create a main file here
+
     Ok(name)
 }
 
@@ -51,39 +53,23 @@ async fn get_as_string(problem: &String) -> Result<reqwest::Response, reqwest::E
 }
 
 fn get_samples(document: Document) -> HashMap<String, String> {
-    // OKAY: so this method in its current state shits the bed due to it reading
-    // the input text area in the problem description as a node. 
-    // this should definetly be fixed 
-    // proposed solution: 
-    // somehow single out the specific areas we need
-    // bandaid solution would be counting them at an offset if its a uneven 
-    // amount of nodes
-    // safe solution is to more intelligently scrape the website
+    // you know what: 
+    // YES this function will shit the bed if it encounters <pre> tags in any 
+    //     place that isnt the input/output spec. If the question does that then
+    //     fuck me 
 
-    // rewrite this shit, what was i even thinking dude
 
-    // okay what do we need to do
-    // we need to get the output and input into a hashmap in the form of:
-    // HashMap<input, output>
-    // 
-
+    // you should play around with the select library too learn it a bit better
     // rewrite according to the spec from runner.rs
     let mut hmap: HashMap<String, String> = HashMap::new();
     let c: Vec<Node> = document.find(Name("pre")).collect();
 
-    for i in c.iter() {
-        println!("output: {}", i.text());
-    }
-
-    /*
     let mut counter = 1;
     for thing in c.iter().step_by(2) {
         hmap.insert(thing.text(), c[counter].text());
         counter += 2;
     }
-    */
 
-    panic!("testing in progress");
 
     hmap
 }
