@@ -11,7 +11,7 @@ mod submitter;
 #[tokio::main]
 async fn main() {
     let mut args: Vec<String> = env::args().rev().collect();
-    
+
     // get rid of file name
     args.pop();
 
@@ -21,7 +21,7 @@ async fn main() {
     let command: String = args.pop()
         .unwrap_or("help".to_string())
         .to_lowercase();
-    
+
 
     match command.as_str() {
         "run" => {
@@ -57,7 +57,7 @@ async fn main() {
                 },
                 Err(ByggisErrors::CompileTimeError(e)) => {
                     println!("     Compilation error:");
-                    
+
                     for line in e.trim().split("\n") {
                         println!("      {}{}{}", style::Bold, line, style::Reset);
                     }
@@ -71,11 +71,11 @@ async fn main() {
         "new" => {
             if args.len() > 0 {
                 let r = creator::create_new(args.pop().unwrap()).await;
-                
+
                 match r {
                     Ok(n) => {
-                        println!("   {}Created{} new byggis folder {}\"{}\"{}", 
-                            color::Fg(color::Green), 
+                        println!("   {}Created{} new byggis folder {}\"{}\"{}",
+                            color::Fg(color::Green),
                             color::Fg(color::Reset),
                             style::Bold,
                             n,
@@ -111,15 +111,9 @@ async fn main() {
         "commit" => {
             // run commit code here
             // should commit have any args?
-            // dont think so 
+            // dont think so
 
-            // read problem name from directory
-            let path = match args.pop() {
-                Some(s) => s,
-                _ => "~/.kattisrc".to_string()
-            };
-
-            let r = submitter::commit(path);
+            let r = submitter::commit();
 
             match r {
                 // we dont need to return anything in the ok
