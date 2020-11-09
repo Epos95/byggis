@@ -130,8 +130,6 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
         },
         "java" => {
             let p = Command::new("javac")
-                .arg("-A")
-                .arg("warnings")
                 .arg("main.java")
                 .stdin( Stdio::piped())
                 .stdout(Stdio::piped())
@@ -177,7 +175,15 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                 .stderr(Stdio::piped())
                 .spawn()
                 .unwrap();
-
+        
+        } else if language == "java" {
+            p = Command::new("java main.class")
+                .stdin( Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .unwrap();
+            
         } else {
             panic!("Something went very, very wrong");
         }

@@ -22,7 +22,7 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
     }
 
     // this might be a bit of a bad design since the above match statment 
-    // basically already unwraps {op} (also dont use unwrap) 
+    // basically already unwraps op (also dont use unwrap) 
     let html = op.unwrap().text().await.unwrap();
     let document = Document::from(html.as_str());
     let hmap = get_samples(document);
