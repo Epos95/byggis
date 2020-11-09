@@ -126,8 +126,27 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                 return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
             }
 
-
             "rust"
+        },
+        "java" => {
+            let p = Command::new("javac")
+                .arg("-A")
+                .arg("warnings")
+                .arg("main.java")
+                .stdin( Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .unwrap();
+
+            let o = &p.wait_with_output();
+            let stderr = &String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
+
+            if stderr != "" {
+                return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
+            }
+            
+            "java"
         },
         _ => {
             return Err(ByggisErrors::UnknownLanguage);

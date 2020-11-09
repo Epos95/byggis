@@ -19,10 +19,6 @@ pub fn commit(path: String) -> Result<(), ByggisErrors> {
 
     // efter detta har vi ett (antagligen) giltigt token att använda
 
-    
-
-
-
 
     Ok(())
 }
