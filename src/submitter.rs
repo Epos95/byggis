@@ -1,46 +1,71 @@
 // this file should contain all the code needed to replicate submitting from the terminal
 use std::process::Command;
-use std::stdin;
+use std::fs;
+use std::io;
+use dirs::home_dir;
+use std::path::PathBuf;
+
+
+use std::path::Path;
 
 use byggis::ByggisErrors;
 
 
-/*!! program flow !!
+/*
  * Handle config file
  * login to kattis / try the username and token
  * Try to submit the thing
  * Handle result from the submission
- */
+*/
 
 
-pub fn commit() -> Result<(), ByggisErrors> {
+pub async fn commit() -> Result<(), ByggisErrors> {
 
     // first try to read from "path" to see if it exists etc
 
     // tries to read config from path
+    let mut standard_path: PathBuf = home_dir().unwrap();
+    standard_path.push(".kattisrc");
 
-    let standard_path = "~/.kattisrc".to_string();
-    // dont know if ~ will expand propperly but heres to hoping
+    // READ ME BEFORE EDITING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // ------------------   I AM IMPORTANT    -------------------------
+    // im trying to use home_dir() to get the home directory path but 
+    // paths are a pain in the ass so keep working around that yea
 
     let result = get_credentials(standard_path);
-    let (username, token) = result.unwrap_or_else(|| {
-        println!("Could not find credentials in that location.\nEnter path to file: ");
 
-        let mut p = String::new();
-        let mut stdin = io::stdin();
-        stdin.read_to_string(&mut p);
+    let (username, token) = match result {
+        Some((x, y)) => (x, y),
+        None => {
+            println!("Could not find credentials in that location.\nEnter path to file: ");
 
-        get_config(p)
-    });
+            let mut p = String::new();
+            let mut stdin = io::stdin();
+            stdin.read_line(&mut p);
+            p.pop();
 
-    let (username, token) = match get_credentials(standard_path) {
-        Some(x, y) => (x, y),
-        None => { return Err(ByggisErrors::ConfigFileNotFound); },
+            match get_credentials(Path::new(&p).to_path_buf()) {
+                Some((x, y)) => (x, y),
+                None => { return Err(ByggisErrors::ConfigFileNotFound); }
+            }
+        }
     };
 
-
+    println!("[DEBUG]\nusername: {}\ntoken: {}", username, token);
 
     // efter detta har vi ett (antagligen) giltigt token att använda
+    let cookies = match login(username, token).await {
+        Ok(n) => {
+            if n.status().is_success() {
+                n.headers().clone()
+            } else if n.status().is_client_error() {
+                return Err(ByggisErrors::InvalidToken);
+            } else {
+                return Err(ByggisErrors::NetworkError);
+            }
+        },
+        Err(_) => { return Err(ByggisErrors::NetworkError); }
+    };
 
     Ok(())
 }
@@ -62,13 +87,39 @@ fn get_problem_name() -> Option<String> {
     }
 }
 
-fn get_credentials(path: String) -> Option<(String, String> {
+fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     // should try and get the credentials from the file in the path
     // the file in the pathn *should* be a valid kattisrc file or one containing similair
-    // content
+    // content, this function CAN return nonvalid credentials e.g: ("", "")
 
-    let username = "".to_string();
-    let token    = "".to_string();
+    // this method (and how it interacts with the public semi main function) 
+    // should prolly be redone, it seems bad. it should be working tho 
+
+    let c = match fs::read_to_string(path) {
+        Ok(n) => n,
+        Err(_) => { return None; } 
+    };
+
+    let mut username: String = "".to_string();
+    let mut token: String    = "".to_string();
+
+    for line in c.split("\n") {
+        if line.contains("token: ") {
+            token = line.split(" ").last().unwrap_or("").to_string();
+        }
+
+        if line.contains("username: ") {
+            username = line.split(" ").last().unwrap_or("").to_string();
+        }
+    }
 
     Some((username, token))
+}
+
+async fn login(user: String, token: String) -> Result<reqwest::Response, reqwest::Error> {
+    let client = reqwest::Client::new();
+    let p = [("user", user), ("script", "true".to_string()), ("token", token)];
+    client.post("https://open.kattis.com/login")
+        .form(&p)
+        .send().await
 }

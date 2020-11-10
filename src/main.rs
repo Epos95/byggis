@@ -113,7 +113,7 @@ async fn main() {
             // should commit have any args?
             // dont think so
 
-            let r = submitter::commit();
+            let r = submitter::commit().await;
 
             match r {
                 // we dont need to return anything in the ok
@@ -131,7 +131,7 @@ async fn main() {
                         color::Fg(color::Reset));
                 },
                 Err(ByggisErrors::ConfigFileNotFound) => {
-                    println!("   {}Error{}: Could not find config file containing token\n\tYou can generate one with {}\"byggis generate\"{}",
+                    println!("   {}Error{}: Could not find config file containing token\n    You can generate one with {}\"byggis generate\"{}",
                         color::Fg(color::Red),
                         color::Fg(color::Reset),
                         style::Bold,
