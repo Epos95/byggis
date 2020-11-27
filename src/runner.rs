@@ -218,7 +218,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                     println!("      {}{}{}", style::Bold, l, style::Reset);
                 }
 
-                println!("");
+                println!();
             } else {
                 // prints output of the test
                 println!("     Output: {}{}{}",
@@ -228,7 +228,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                         .unwrap()
                         .stdout).trim(),
                     style::Reset);
-                println!("");
+                println!();
             }
         }
     }

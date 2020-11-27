@@ -92,7 +92,7 @@ async fn main() {
                             color::Fg(color::Reset));
                     },
                     Err(ByggisErrors::DirectoryNotCreated) => {
-                        println!("   {}Error{}: Director could not be created",
+                        println!("   {}Error{}: Directory could not be created",
                             color::Fg(color::Red),
                             color::Fg(color::Reset));
                     },
