@@ -102,11 +102,12 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     // should try and get the credentials from the file in the path
     // the file in the pathn *should* be a valid kattisrc file or one containing similair
     // content, this function CAN return nonvalid credentials e.g: ("", "")
+    // later comment: if it CAN return nonvalid things shouldnt it be a result??
 
     // this method (and how it interacts with the public semi main function) 
     // should prolly be redone, it seems bad. it should be working tho 
 
-    let c = match fs::read_to_string(path) {
+    let config = match fs::read_to_string(path) {
         Ok(n) => n,
         Err(_) => { return None; } 
     };
@@ -114,7 +115,7 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     let mut username: String = "".to_string();
     let mut token: String    = "".to_string();
 
-    for line in c.split('\n') {
+    for line in config.split('\n') {
         if line.contains("token: ") {
             token = line.split(' ').last().unwrap_or("").to_string();
         }
