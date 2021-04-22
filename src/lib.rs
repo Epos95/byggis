@@ -41,3 +41,12 @@ pub async fn test_select() {
 
 
 }
+
+// This function returns all the currently supported languages in a vector
+pub fn get_supported_languages() -> Vec<String> {
+    vec!["rust", "python", "java"]
+        .iter()
+        .map(|x| x.to_string())
+        .collect()
+}
+
