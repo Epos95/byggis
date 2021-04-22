@@ -6,6 +6,7 @@ use reqwest;
 use std::fs;
 use serde_json;
 use byggis::ByggisErrors;
+use termion::*;
 
 pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
 
@@ -27,7 +28,7 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
     let document = Document::from(html.as_str());
     let hmap = get_samples(document);
 
-    if let Err(_) = fs::create_dir(&name) {
+    if fs::create_dir(&name).is_err() {
         return Err(ByggisErrors::DirectoryNotCreated);
     }
 
@@ -63,6 +64,17 @@ fn get_samples(document: Document) -> HashMap<String, String> {
     // rewrite according to the spec from runner.rs
     let mut hmap: HashMap<String, String> = HashMap::new();
     let c: Vec<Node> = document.find(Name("pre")).collect();
+
+
+    if c.len() % 2 != 0 {
+        println!("    {}BIG ERROR{}: This kattis problem has a weird problem definition\
+                  which caused the webscraping part to shit the bed.\n     Do not use \
+                  byggis with this problem.",
+                 color::Fg(color::Red),
+                 color::Fg(color::Reset));
+        println!("Oopsie woopsie, we did a fucky wucky. We are working wevy hard to fix this error");
+        panic!();
+    }
 
     let mut counter = 1;
     for thing in c.iter().step_by(2) {

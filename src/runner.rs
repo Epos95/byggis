@@ -105,7 +105,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
 
 
     // get the used language and compile/setup for running the file
-    let language = match main_file.split(".").last().unwrap() {
+    let language = match main_file.split('.').last().unwrap() {
         "py" => "python",
         "rs" => {
             // create a process for compiling rust file and check output
@@ -177,7 +177,8 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                 .unwrap();
         
         } else if language == "java" {
-            p = Command::new("java main.class")
+            p = Command::new("java")
+                .arg("main.class")
                 .stdin( Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
@@ -204,7 +205,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
         if String::from_utf8_lossy(&o.as_ref().unwrap().stdout) == s_output {
             println!("    Test: {}ok{}\n", color::Fg(color::Green), color::Fg(color::Reset));
         } else {
-            println!("    Test: {}failed{}", color::Fg(color::Red), color::Fg(color::Reset));
+            println!("    Test: {}failed{}\n", color::Fg(color::Red), color::Fg(color::Reset));
 
             // handle runtime errors and pretty print them
             //  NOTE: This does not get handled by main.rs since its a 

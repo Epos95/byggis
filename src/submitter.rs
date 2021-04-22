@@ -114,13 +114,13 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     let mut username: String = "".to_string();
     let mut token: String    = "".to_string();
 
-    for line in c.split("\n") {
+    for line in c.split('\n') {
         if line.contains("token: ") {
-            token = line.split(" ").last().unwrap_or("").to_string();
+            token = line.split(' ').last().unwrap_or("").to_string();
         }
 
         if line.contains("username: ") {
-            username = line.split(" ").last().unwrap_or("").to_string();
+            username = line.split(' ').last().unwrap_or("").to_string();
         }
     }
 
