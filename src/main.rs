@@ -10,6 +10,12 @@ mod submitter;
 
 #[tokio::main]
 async fn main() {
+    // TODO: port this to clap
+    // TODO: next level errror handling, we talking inheritance, structs etc
+    // TODO: port all this to crossterm
+    // TODO: absorb the structure of ica (all modules sharing errors and handling them all is actually a bit bad.)
+
+
     let mut args: Vec<String> = env::args().rev().collect();
 
     // get rid of file name

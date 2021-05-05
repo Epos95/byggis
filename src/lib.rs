@@ -42,11 +42,21 @@ pub async fn test_select() {
 
 }
 
-// This function returns all the currently supported languages in a vector
+/// This function returns all the currently supported languages in a vector
 pub fn get_supported_languages() -> Vec<String> {
     vec!["rust", "python", "java"]
         .iter()
         .map(|x| x.to_string())
         .collect()
+}
+
+/*
+ * to support more and better errors we should implement them by class of error (e.g networking, system, user etc)
+ * and then uniting them with a common trait (interface) which prints out the error information
+ * recoverable errors should be handled within the module "main" function (the function that main.rs calls, the entry point)
+ */
+
+trait PrintErrorCode {
+    fn print(&self); 
 }
 

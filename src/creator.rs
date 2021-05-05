@@ -7,6 +7,14 @@ use std::fs;
 use serde_json;
 use byggis::ByggisErrors;
 use termion::*;
+use std::io;
+
+pub fn get_supported_languages() -> Vec<String> {
+    vec!["rust", "python", "java"]
+        .iter()
+        .map(|x| x.to_string())
+        .collect()
+}
 
 pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
 
@@ -42,6 +50,39 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
     }
 
     // maybe ask user if they want to create a main file here
+
+    println!("  Create main file? [y/n]");
+    let mut buffer = String::new();
+    let mut stdin = io::stdin();
+    stdin.read_line(&mut buffer).expect("IO errror.");
+
+    if buffer.to_lowercase() == "y" {
+        let langs = byggis::get_supported_languages();
+        println!("   Supported languages: ");
+        for (i, lang) in langs.iter().enumerate() {
+            println!("    {}: {}", i+1, lang);
+        }
+
+        println!("  Choose a language. [n]");
+        buffer = String::new();
+        stdin.read_line(&mut buffer).expect("IO errror.");
+        let selected = match langs.get(buffer.parse::<usize>().unwrap_or(999)) {
+            Some(x) => x,
+            None => {
+                println!("  {}Error{}: Invalid selection, aborting...",
+                        color::Fg(color::Red),
+                        color::Fg(color::Reset));
+                // TODO: return a error here, untill then we panic!
+                panic!();
+            }
+        };
+
+    }
+
+
+
+
+
 
     Ok(name)
 }
