@@ -1,7 +1,7 @@
 use byggis;
 use std::env;
 use byggis::ByggisErrors;
-use termion::*;
+use crossterm::style::*;
 
 mod creator;
 mod runner;
@@ -41,38 +41,32 @@ async fn main() {
                     println!("   Tests completed.");
                 },
                 Err(ByggisErrors::ByggisFileNotFound) => {
-                    println!("   {}Error{}: Could not find byggis file in folder",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Could not find byggis file in folder",
+                        "Error".red());
                     println!("    Did you run \"byggis new 'name'\"?");
                 },
                 Err(ByggisErrors::TestsNotFound) => {
-                    println!("   {}Error{}: Could not find tests in byggis file",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Could not find tests in byggis file",
+                        "Error".red());
                 },
                 Err(ByggisErrors::MainNotFound) => {
-                    println!("   {}Error{}: Could not find a main file to test with",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Could not find a main file to test with",
+                        "Error".red());
                 },
                 Err(ByggisErrors::UnknownLanguage) => {
-                    println!("   {}Error{}: Language not implemented",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Language not implemented",
+                        "Error".red());
                 },
                 Err(ByggisErrors::CompileTimeError(e)) => {
                     println!("     Compilation error:");
 
                     for line in e.trim().split("\n") {
-                        println!("      {}{}{}", style::Bold, line, style::Reset);
+                        println!("      {}", line.bold());
                     }
                     println!("");
                 },
                 _ => {}
             }
-
-
         },
         "new" => {
             if args.len() > 0 {
@@ -80,32 +74,25 @@ async fn main() {
 
                 match r {
                     Ok(n) => {
-                        println!("   {}Created{} new byggis folder {}\"{}\"{}",
-                            color::Fg(color::Green),
-                            color::Fg(color::Reset),
-                            style::Bold,
-                            n,
-                            style::Reset);
+                        println!("   {} new byggis folder \"{}\"",
+                            "Created".green(),
+                            n.bold());
                     },
                     Err(ByggisErrors::NetworkError) => {
-                        println!("   {}Error{}: Could not connect to open.kattis.com",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
+                        println!("   {}: Could not connect to open.kattis.com",
+                            "Error".red());
                     },
                     Err(ByggisErrors::ProblemNotFound) => {
-                        println!("   {}Error{}: Could not find that problem on kattis",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
+                        println!("   {}: Could not find that problem on kattis",
+                            "Error".red());
                     },
                     Err(ByggisErrors::DirectoryNotCreated) => {
-                        println!("   {}Error{}: Directory could not be created",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
+                        println!("   {}: Director could not be created",
+                            "Error".red());
                     },
                     Err(ByggisErrors::ByggisFileNotCreated) => {
-                        println!("   {}Error{}: byggis file could not be created",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
+                        println!("   {}: byggis file could not be created",
+                            "Error".red());
                     },
                     _ => {}
                 }
@@ -127,26 +114,21 @@ async fn main() {
                     println!("Success!")
                 },
                 Err(ByggisErrors::NetworkError) => {
-                    println!("   {}Error{}: Could not connect to open.kattis.com",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Could not connect to open.kattis.com",
+                        "Error".red());
                 },
                 Err(ByggisErrors::MainNotFound) => {
-                    println!("   {}Error{}: Could not find a main file to test with",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Could not find a main file to test with",
+                        "Error".red());
                 },
                 Err(ByggisErrors::ConfigFileNotFound) => {
-                    println!("   {}Error{}: Could not find config file containing token\n    You can generate one with {}\"byggis generate\"{}",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset),
-                        style::Bold,
-                        style::Reset);
+                    println!("   {}: Could not find config file containing token\n    You can generate one with \"{}\"",
+                        "Error".red(),
+                        "Byggis generate".bold());
                 },
                 Err(ByggisErrors::InvalidToken) => {
-                    println!("   {}Error{}: Invalid token",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Invalid token",
+                        "Error".red());
                 },
                 _ => {
                     panic!("Unimplemented error");
