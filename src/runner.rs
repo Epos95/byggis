@@ -206,9 +206,9 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             .write(s_input.as_bytes())
             .unwrap();
 
-        println!("   Test case:\n");
+        println!("   Test case:");
         for s in s_input.split("\n") {
-            println!("    {}", s.trim().bold());
+            println!("     {}", s.trim().italic());
         }
 
         let o = &p.wait_with_output();
