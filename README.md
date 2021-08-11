@@ -11,31 +11,34 @@ $ cargo install byggis
 ## Usage 
 Create a new folder for your problem and download the test cases from Kattis.
 ```bash
-$ byggis new {namn på problem}
+$ byggis new <PROBLEM ID>
 ```
 
-Manually create a main file to keep the code in.
-```bash
-$ touch main.{extension}
-```
+Byggis will then prompt you if you want to create a main file with a starter code snippet in it.
+
 Supported languages:
 * Python
 * Rust
+* Java
+* Haskell
 
-To test your code from main.* against the test cases from kattis
+To test your code against the test cases from kattis just do:
 ```bash
 $ byggis run
 ```
+if there are multiple main files, byggis will ask you which one to use.
 
 ## TODO
 - [x] Implement rust
+- [x] Better help messages
 - [ ] Description of the problem from Kattis
-- [ ] Better help messages
 - [ ] Implement C
 - [ ] Implement C++
+- [ ] Implement submissions
+- [ ] Write tests
 
-# Contribute
-Currently the only supported languages are python and Rust. If your preffered language is not supported, please contact me for more information etc.
+## Contribute
+Currently the only supported languages are python and Rust. If your prefered language is not supported, please put in a pull request.
 
-# Licens
+## license
 [MIT](https://choosealicense.com/licenses/mit/)
