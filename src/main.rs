@@ -1,118 +1,121 @@
 use byggis;
-use std::env;
 use byggis::ByggisErrors;
-use termion::*;
+use crossterm::style::*;
+use clap::{
+    App, 
+    Arg,
+};
 
 mod creator;
 mod runner;
-mod helper;
 mod submitter;
+
+const VERSION: &str = "0.3.2";
+const AUTHOR:  &str = "Epos95";
 
 #[tokio::main]
 async fn main() {
-    let mut args: Vec<String> = env::args().rev().collect();
+    // TODO: Implement submissions
+    // TODO: Let byggis show the problen description in the terminal
+    // TODO: Write tests for a basic workflow
+    // TODO: Add comments where they are needed
 
-    // get rid of file name
-    args.pop();
+    let matches = App::new("Byggis")
+        .version(VERSION)
+        .author(AUTHOR)
+        .about("A build and testing system for kattis problems")
+        .subcommand(App::new("run")
+            .about("Runs tests for the selected problem")
+            .version(VERSION)
+            .author(AUTHOR))
+        .subcommand(App::new("new")
+            .about("Downloads and creates a new directory for a given kattis problem")
+            .version(VERSION)
+            .author(AUTHOR)
+            .arg(Arg::new("filename")
+                .takes_value(true)
+                .required(true)
+                .value_name("FILE")))
+        .subcommand(App::new("commit")
+            .about("Submits the selected file to kattis (not done)")
+            .version(VERSION)
+            .author(AUTHOR)
+            .arg(Arg::new("filename to submit")
+                .takes_value(true)
+                .required(false)
+                .value_name("FILE")))
+        .get_matches();
 
-    // pop the rightmost element in args, if there is none (e.g args.len == 0)
-    // it will default to "help" which will show the help command
-    // lowercases input for normalization purposes
-    let command: String = args.pop()
-        .unwrap_or("help".to_string())
-        .to_lowercase();
+    if matches.is_present("run") {
 
+        let r = runner::run_tests();
+        match r {
+            Ok(_) => {
+                println!("   Tests completed.");
+            },
+            Err(ByggisErrors::ByggisFileNotFound) => {
+                println!("   {}: Could not find byggis file in folder",
+                    "Error".red());
+                println!("    Did you run \"byggis new 'name'\"?");
+            },
+            Err(ByggisErrors::TestsNotFound) => {
+                println!("   {}: Could not find tests in byggis file",
+                    "Error".red());
+            },
+            Err(ByggisErrors::MainNotFound) => {
+                println!("   {}: Could not find a main file to test with",
+                    "Error".red());
+            },
+            Err(ByggisErrors::UnknownLanguage) => {
+                println!("   {}: Language not implemented",
+                    "Error".red());
+            },
+            Err(ByggisErrors::CompileTimeError(e)) => {
+                println!("     Compilation error:");
 
-    match command.as_str() {
-        "run" => {
-            // maybe accept name of file to run as input
-            // default to main.something
-
-            // TODO: maybe solve multiple main files
-            let r = runner::run_tests();
-            match r {
-                Ok(_) => {
-                    println!("   Tests completed.");
-                },
-                Err(ByggisErrors::ByggisFileNotFound) => {
-                    println!("   {}Error{}: Could not find byggis file in folder",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
-                    println!("    Did you run \"byggis new 'name'\"?");
-                },
-                Err(ByggisErrors::TestsNotFound) => {
-                    println!("   {}Error{}: Could not find tests in byggis file",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
-                },
-                Err(ByggisErrors::MainNotFound) => {
-                    println!("   {}Error{}: Could not find a main file to test with",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
-                },
-                Err(ByggisErrors::UnknownLanguage) => {
-                    println!("   {}Error{}: Language not implemented",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
-                },
-                Err(ByggisErrors::CompileTimeError(e)) => {
-                    println!("     Compilation error:");
-
-                    for line in e.trim().split("\n") {
-                        println!("      {}{}{}", style::Bold, line, style::Reset);
-                    }
-                    println!("");
-                },
-                _ => {}
-            }
-
-
-        },
-        "new" => {
-            if args.len() > 0 {
-                let r = creator::create_new(args.pop().unwrap()).await;
-
-                match r {
-                    Ok(n) => {
-                        println!("   {}Created{} new byggis folder {}\"{}\"{}",
-                            color::Fg(color::Green),
-                            color::Fg(color::Reset),
-                            style::Bold,
-                            n,
-                            style::Reset);
-                    },
-                    Err(ByggisErrors::NetworkError) => {
-                        println!("   {}Error{}: Could not connect to open.kattis.com",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
-                    },
-                    Err(ByggisErrors::ProblemNotFound) => {
-                        println!("   {}Error{}: Could not find that problem on kattis",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
-                    },
-                    Err(ByggisErrors::DirectoryNotCreated) => {
-                        println!("   {}Error{}: Director could not be created",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
-                    },
-                    Err(ByggisErrors::ByggisFileNotCreated) => {
-                        println!("   {}Error{}: byggis file could not be created",
-                            color::Fg(color::Red),
-                            color::Fg(color::Reset));
-                    },
-                    _ => {}
+                for line in e.trim().split("\n") {
+                    println!("      {}", line.bold());
                 }
-            } else {
-                helper::show_help(helper::HelpTypes::New);
-            }
+                println!("");
+            },
+            _ => {}
+        }
+    } else if matches.is_present("new") {
+        let filename: String = if let Some(ref m) = matches.subcommand_matches("new") {
+            m.value_of("filename").unwrap().to_string()
+        } else {
+            println!("   {}: Somehow failed...", "Error".red());
+            panic!();
+        };
+        let r = creator::create_new(filename).await;
 
-        },
-        "commit" => {
-            // run commit code here
-            // should commit have any args?
-            // dont think so
-
+        match r {
+            Ok(n) => {
+                println!("   {} new byggis folder \"{}\"",
+                    "Created".green(),
+                    n.bold());
+            },
+            Err(ByggisErrors::NetworkError) => {
+                println!("   {}: Could not connect to open.kattis.com",
+                    "Error".red());
+            },
+            Err(ByggisErrors::ProblemNotFound) => {
+                println!("   {}: Could not find that problem on kattis",
+                    "Error".red());
+            },
+            Err(ByggisErrors::DirectoryNotCreated) => {
+                println!("   {}: Director could not be created",
+                    "Error".red());
+            },
+            Err(ByggisErrors::ByggisFileNotCreated) => {
+                println!("   {}: byggis file could not be created",
+                    "Error".red());
+            },
+            _ => {}
+        }
+    }  else if matches.is_present("commit") {
+        panic!("Not implemented yet");
+        #[allow(unreachable_code)] {
             let r = submitter::commit().await;
 
             match r {
@@ -121,35 +124,26 @@ async fn main() {
                     println!("Success!")
                 },
                 Err(ByggisErrors::NetworkError) => {
-                    println!("   {}Error{}: Could not connect to open.kattis.com",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Could not connect to open.kattis.com",
+                        "Error".red());
                 },
                 Err(ByggisErrors::MainNotFound) => {
-                    println!("   {}Error{}: Could not find a main file to test with",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Could not find a main file to test with",
+                        "Error".red());
                 },
                 Err(ByggisErrors::ConfigFileNotFound) => {
-                    println!("   {}Error{}: Could not find config file containing token\n    You can generate one with {}\"byggis generate\"{}",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset),
-                        style::Bold,
-                        style::Reset);
+                    println!("   {}: Could not find config file containing token\n    You can generate one with \"{}\"",
+                        "Error".red(),
+                        "Byggis generate".bold());
                 },
                 Err(ByggisErrors::InvalidToken) => {
-                    println!("   {}Error{}: Invalid token",
-                        color::Fg(color::Red),
-                        color::Fg(color::Reset));
+                    println!("   {}: Invalid token",
+                        "Error".red());
                 },
                 _ => {
                     panic!("Unimplemented error");
                 }
             }
-
-        }
-        _ => {
-            helper::show_help(helper::HelpTypes::Program);
         }
     }
 }

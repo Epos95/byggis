@@ -23,21 +23,46 @@ pub enum ByggisErrors {
         // scenario where kattis refuses the given token
     FileReadingError,
         // scenario where byggis cannot read from the token file
+    MainFailure,
+        // scenario where byggis cannot create the main file
 
 }
 
-
-pub struct DotByggis {
-    test_inputs : Vec<String>,
-    test_outputs : Vec<String>
-    // problem_description : Vec<String>
+pub use enum_iterator::IntoEnumIterator;
+#[derive(Debug, IntoEnumIterator, PartialEq)]
+pub enum SupportedLanguages {
+    Rust,
+    Java,
+    Python,
+    Haskell,
 }
+ 
+impl SupportedLanguages {
+    pub fn from_string(&self, s: String) -> Option<Self> {
+        match s.as_str() {
+            "rust"    => Some(SupportedLanguages::Rust),
+            "python"  => Some(SupportedLanguages::Python),
+            "java"    => Some(SupportedLanguages::Java),
+            "haskell" => Some(SupportedLanguages::Haskell),
+            _         => None
+        }
+    }
 
+    pub fn name(&self) -> String {
+        match &self {
+            SupportedLanguages::Rust    => String::from("rust"),
+            SupportedLanguages::Python  => String::from("python"),
+            SupportedLanguages::Java    => String::from("java"),
+            SupportedLanguages::Haskell => String::from("haskell")
+        }
+    }
 
-// call this method from main cuz fuck testing 
-// this is where we should play arond with select a bit more
-use select::*;
-pub async fn test_select() {
-
-
+    pub fn extension(&self) -> String {
+        match &self {
+            SupportedLanguages::Rust    => String::from("rs"),
+            SupportedLanguages::Python  => String::from("py"),
+            SupportedLanguages::Java    => String::from("java"),
+            SupportedLanguages::Haskell => String::from("hs")
+        }
+    }
 }

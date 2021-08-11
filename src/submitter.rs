@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(unused_mut)]
+
 // this file should contain all the code needed to replicate submitting from the terminal
 use std::process::Command;
 use std::fs;
@@ -5,11 +8,9 @@ use std::io;
 use dirs::home_dir;
 use std::path::PathBuf;
 
-
 use std::path::Path;
 
 use byggis::ByggisErrors;
-
 
 /*
  * Handle config file
@@ -18,7 +19,6 @@ use byggis::ByggisErrors;
  * Handle result from the submission
 */
 
-
 pub async fn commit() -> Result<(), ByggisErrors> {
 
     // first try to read from "path" to see if it exists etc
@@ -26,11 +26,6 @@ pub async fn commit() -> Result<(), ByggisErrors> {
     // tries to read config from path
     let mut standard_path: PathBuf = home_dir().unwrap();
     standard_path.push(".kattisrc");
-
-    // READ ME BEFORE EDITING!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // ------------------   I AM IMPORTANT    -------------------------
-    // im trying to use home_dir() to get the home directory path but 
-    // paths are a pain in the ass so keep working around that yea
 
     let result = get_credentials(standard_path);
 
@@ -41,7 +36,7 @@ pub async fn commit() -> Result<(), ByggisErrors> {
 
             let mut p = String::new();
             let mut stdin = io::stdin();
-            stdin.read_line(&mut p);
+            stdin.read_line(&mut p).unwrap();
             p.pop();
 
             match get_credentials(Path::new(&p).to_path_buf()) {
@@ -54,7 +49,10 @@ pub async fn commit() -> Result<(), ByggisErrors> {
     println!("[DEBUG]\nusername: {}\ntoken: {}", username, token);
 
     // efter detta har vi ett (antagligen) giltigt token att använda
-    let cookies = match login(username, token).await {
+
+
+    // detta är nog inte klart idfk
+    let headers = match login(username, token).await {
         Ok(n) => {
             if n.status().is_success() {
                 n.headers().clone()
@@ -66,6 +64,22 @@ pub async fn commit() -> Result<(), ByggisErrors> {
         },
         Err(_) => { return Err(ByggisErrors::NetworkError); }
     };
+
+
+    let problem_name = match get_problem_name() {
+        Some(s) => s,
+        None => {
+            println!("Could not read directory name.\nWhat is the name of the problem youre trying to submit?");
+
+            let mut p = String::new();
+            let mut stdin = io::stdin();
+            stdin.read_line(&mut p).unwrap();
+            p.pop();
+            p
+        }
+    };
+
+    // try and find main file
 
     Ok(())
 }
@@ -91,11 +105,12 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     // should try and get the credentials from the file in the path
     // the file in the pathn *should* be a valid kattisrc file or one containing similair
     // content, this function CAN return nonvalid credentials e.g: ("", "")
+    // later comment: if it CAN return nonvalid things shouldnt it be a result??
 
     // this method (and how it interacts with the public semi main function) 
     // should prolly be redone, it seems bad. it should be working tho 
 
-    let c = match fs::read_to_string(path) {
+    let config = match fs::read_to_string(path) {
         Ok(n) => n,
         Err(_) => { return None; } 
     };
@@ -103,13 +118,13 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     let mut username: String = "".to_string();
     let mut token: String    = "".to_string();
 
-    for line in c.split("\n") {
+    for line in config.split('\n') {
         if line.contains("token: ") {
-            token = line.split(" ").last().unwrap_or("").to_string();
+            token = line.split(' ').last().unwrap_or("").to_string();
         }
 
         if line.contains("username: ") {
-            username = line.split(" ").last().unwrap_or("").to_string();
+            username = line.split(' ').last().unwrap_or("").to_string();
         }
     }
 

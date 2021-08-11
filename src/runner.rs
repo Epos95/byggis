@@ -3,10 +3,10 @@ use std::fs;
 use serde_json;
 use std::process::{Command, Stdio};
 use std::io::prelude::*;
-use termion::*;
 use byggis::ByggisErrors;
 use regex::Regex;
 use std::io;
+use crossterm::style::*;
 
 // NOTE: Should probably split this into multiple functions for easier reading and stuff
 pub fn run_tests() -> Result<(), ByggisErrors> {
@@ -59,19 +59,16 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
     let mut num: i32 = 1;
     if f_vec.len() > 1 {
         // handles more than one main file
-        println!("  {}Note{}: Detected more than one main file...",
-            color::Fg(color::Blue),
-            color::Fg(color::Reset));
+        println!("  {}: Detected more than one main file...",
+            "Note".blue());
         println!("   Select main file to use:");
 
 
         // prints out the files in a nice manner
         for (i, f) in f_vec.iter().enumerate() {
-            println!("     {}: {}{}{}",
+            println!("     {}: {}",
                 i+1,
-                style::Bold,
-                f,
-                style::Reset);
+                f.to_string().bold());
         }
 
 
@@ -83,18 +80,16 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
 
         // parse the input from n/stdin into a clean integer
         num = n.parse().unwrap_or_else(|_| {
-            println!("    {}Error{}: Could not convert to int, defaulting to first option.",
-                color::Fg(color::Red),
-                color::Fg(color::Reset));
+            println!("    {}: Could not convert to int, defaulting to first option.",
+                "Error".red());
             1
         });
 
 
         // error checking operation, defaults to first option
         if num > f_vec.len() as i32 {
-            println!("    {}Error{}: Number not an option, defaulting to first option",
-                color::Fg(color::Red),
-                color::Fg(color::Reset));
+            println!("    {}: Number not an option, defaulting to first option",
+                "Error".red());
             num = 1;
         }
     }
@@ -105,7 +100,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
 
 
     // get the used language and compile/setup for running the file
-    let language = match main_file.split(".").last().unwrap() {
+    let language = match main_file.split('.').last().unwrap() {
         "py" => "python",
         "rs" => {
             // create a process for compiling rust file and check output
@@ -146,6 +141,25 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             
             "java"
         },
+        "hs" => {
+            let p = Command::new("ghc")
+                .arg("main.hs")
+                .stdin( Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .unwrap();
+
+            let o = &p.wait_with_output();
+            let stderr = &String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
+
+            if stderr != "" {
+                return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
+            }
+
+            "haskell"
+
+        }
         _ => {
             return Err(ByggisErrors::UnknownLanguage);
         }
@@ -177,13 +191,22 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                 .unwrap();
         
         } else if language == "java" {
-            p = Command::new("java main.class")
+            p = Command::new("java")
+                .arg("main.class")
                 .stdin( Stdio::piped())
                 .stdout(Stdio::piped())
                 .stderr(Stdio::piped())
                 .spawn()
                 .unwrap();
-            
+        } else if language == "haskell" {
+            p = Command::new("./main")
+                .stdin( Stdio::piped())
+                .stdout(Stdio::piped())
+                .stderr(Stdio::piped())
+                .spawn()
+                .unwrap();
+
+
         } else {
             panic!("Something went very, very wrong");
         }
@@ -196,15 +219,15 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             .write(s_input.as_bytes())
             .unwrap();
 
-        println!("   Testing {}{}{} against program..", style::Bold, s_input.trim(), style::Reset);
+        println!("   Test case: \n{}", s_input.trim().bold());
 
         let o = &p.wait_with_output();
 
         // print out the test results
         if String::from_utf8_lossy(&o.as_ref().unwrap().stdout) == s_output {
-            println!("    Test: {}ok{}\n", color::Fg(color::Green), color::Fg(color::Reset));
+            println!("    Test: {}\n", "ok".green());
         } else {
-            println!("    Test: {}failed{}", color::Fg(color::Red), color::Fg(color::Reset));
+            println!("    Test: {}", "failed".red());
 
             // handle runtime errors and pretty print them
             //  NOTE: This does not get handled by main.rs since its a 
@@ -215,19 +238,17 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                 println!("     Error:");
 
                 for l in String::from_utf8_lossy(&o.as_ref().unwrap().stderr).trim().split("\n") {
-                    println!("      {}{}{}", style::Bold, l, style::Reset);
+                    println!("      {}", l.bold());
                 }
 
-                println!("");
+                println!();
             } else {
                 // prints output of the test
-                println!("     Output: {}{}{}",
-                    style::Italic,
+                println!("     Output: \n{}",
                     String::from_utf8_lossy(&o
                         .as_ref()
                         .unwrap()
-                        .stdout).trim(),
-                    style::Reset);
+                        .stdout).trim().italic());
                 println!("");
             }
         }
