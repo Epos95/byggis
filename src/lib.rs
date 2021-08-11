@@ -38,12 +38,12 @@ pub enum SupportedLanguages {
 }
  
 impl SupportedLanguages {
-    pub fn from_string(&self, s: String) -> Option<Self> {
+    pub fn from_string(s: String) -> Option<Self> {
         match s.as_str() {
-            "rust"    => Some(SupportedLanguages::Rust),
-            "python"  => Some(SupportedLanguages::Python),
-            "java"    => Some(SupportedLanguages::Java),
-            "haskell" => Some(SupportedLanguages::Haskell),
+            "rust" | "rs"    => Some(SupportedLanguages::Rust),
+            "python" | "py"  => Some(SupportedLanguages::Python),
+            "java"           => Some(SupportedLanguages::Java),
+            "haskell" | "hs" => Some(SupportedLanguages::Haskell),
             _         => None
         }
     }
@@ -65,4 +65,6 @@ impl SupportedLanguages {
             SupportedLanguages::Haskell => String::from("hs")
         }
     }
+
+    //pub fn get_contents()
 }

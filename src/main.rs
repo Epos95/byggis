@@ -87,6 +87,7 @@ async fn main() {
             println!("   {}: Somehow failed...", "Error".red());
             panic!();
         };
+
         let r = creator::create_new(filename).await;
 
         match r {

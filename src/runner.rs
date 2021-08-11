@@ -7,6 +7,7 @@ use byggis::ByggisErrors;
 use regex::Regex;
 use std::io;
 use crossterm::style::*;
+use byggis::SupportedLanguages;
 
 // NOTE: Should probably split this into multiple functions for easier reading and stuff
 pub fn run_tests() -> Result<(), ByggisErrors> {
@@ -94,15 +95,15 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
         }
     }
 
-
     // gets the file name from the vector of names based on the inputed index
     let main_file: &String = &f_vec[(num-1) as usize];
 
+    let language = SupportedLanguages::from_string(main_file.split(".").last().unwrap().to_string()).unwrap();
 
     // get the used language and compile/setup for running the file
-    let language = match main_file.split('.').last().unwrap() {
-        "py" => "python",
-        "rs" => {
+    match language {
+        SupportedLanguages::Python => {},
+        SupportedLanguages::Rust => {
             // create a process for compiling rust file and check output
             let p = Command::new("rustc")
                 .arg("-A")
@@ -120,10 +121,8 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             if stderr != "" {
                 return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
             }
-
-            "rust"
         },
-        "java" => {
+        SupportedLanguages::Java => {
             let p = Command::new("javac")
                 .arg("main.java")
                 .stdin( Stdio::piped())
@@ -138,10 +137,8 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             if stderr != "" {
                 return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
             }
-            
-            "java"
         },
-        "hs" => {
+        SupportedLanguages::Haskell => {
             let p = Command::new("ghc")
                 .arg("main.hs")
                 .stdin( Stdio::piped())
@@ -156,12 +153,6 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             if stderr != "" {
                 return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
             }
-
-            "haskell"
-
-        }
-        _ => {
-            return Err(ByggisErrors::UnknownLanguage);
         }
     };
 
@@ -171,46 +162,42 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
 
         // spawn process and execute file
         let mut p;
-        if language == "rust" {
-
-            p = Command::new("./main")
-                .stdin( Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-        } else if language == "python" {
-
-            p = Command::new("python")
-                .arg("main.py")
-                .stdin( Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-        
-        } else if language == "java" {
-            p = Command::new("java")
-                .arg("main.class")
-                .stdin( Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-        } else if language == "haskell" {
-            p = Command::new("./main")
-                .stdin( Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-
-        } else {
-            panic!("Something went very, very wrong");
+        match language {
+            SupportedLanguages::Rust => {
+                p = Command::new("./main")
+                    .stdin( Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::piped())
+                    .spawn()
+                    .unwrap();
+            },
+            SupportedLanguages::Python => {
+                p = Command::new("python")
+                    .arg("main.py")
+                    .stdin( Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::piped())
+                    .spawn()
+                    .unwrap();
+            }, 
+            SupportedLanguages::Java => {
+                p = Command::new("java")
+                    .arg("main.class")
+                    .stdin( Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::piped())
+                    .spawn()
+                    .unwrap();
+            }, 
+            SupportedLanguages::Haskell => {
+                p = Command::new("./main")
+                    .stdin( Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::piped())
+                    .spawn()
+                    .unwrap();
+            }
         }
-
 
         // feed the process the input from the file
         p.stdin
@@ -219,7 +206,10 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             .write(s_input.as_bytes())
             .unwrap();
 
-        println!("   Test case: \n{}", s_input.trim().bold());
+        println!("   Test case:\n");
+        for s in s_input.split("\n") {
+            println!("    {}", s.trim().bold());
+        }
 
         let o = &p.wait_with_output();
 
