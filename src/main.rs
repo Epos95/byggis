@@ -10,7 +10,7 @@ mod creator;
 mod runner;
 mod submitter;
 
-const VERSION: &str = "0.3.2";
+const VERSION: &str = "0.3.3";
 const AUTHOR:  &str = "Epos95";
 
 #[tokio::main]
@@ -19,6 +19,9 @@ async fn main() {
     // TODO: Let byggis show the problen description in the terminal
     // TODO: Write tests for a basic workflow
     // TODO: Add comments where they are needed
+    // TODO: Show the output byggis expected on error
+    // TODO: Report error if simulation runs too long
+    // TODO: program output testing doesnt work on windows!
 
     let matches = App::new("Byggis")
         .version(VERSION)
