@@ -8,8 +8,8 @@ use serde_json;
 use byggis::*;
 use crossterm::style::*;
 use std::io;
-
 use std::io::prelude::*;
+
 pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
 
     let op = get_from_string(&name).await;

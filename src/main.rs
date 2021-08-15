@@ -21,7 +21,6 @@ async fn main() {
     // TODO: Add comments where they are needed
     // TODO: Show the output byggis expected on error
     // TODO: Report error if simulation runs too long
-    // TODO: program output testing doesnt work on windows!
     // TODO: multiple main files of the same language
 
     let matches = App::new("Byggis")

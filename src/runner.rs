@@ -214,7 +214,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
         let o = &p.wait_with_output();
 
         // print out the test results
-        if String::from_utf8_lossy(&o.as_ref().unwrap().stdout) == s_output {
+        if String::from_utf8_lossy(&o.as_ref().unwrap().stdout).replace("\r", "") == s_output {
             println!("    Test: {}\n", "ok".green());
         } else {
             println!("    Test: {}", "failed".red());
