@@ -10,7 +10,7 @@ mod creator;
 mod runner;
 mod submitter;
 
-const VERSION: &str = "0.3.4";
+const VERSION: &str = "0.3.5";
 const AUTHOR:  &str = "Epos95";
 
 #[tokio::main]
@@ -20,6 +20,7 @@ async fn main() {
     // TODO: Write tests for a basic workflow
     // TODO: Add comments where they are needed
     // TODO: multiple main files of the same language
+    // TODO: maybe add an arg to "byggis run" that toggles time measuring
 
     let matches = App::new("Byggis")
         .version(VERSION)
