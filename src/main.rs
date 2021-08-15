@@ -10,7 +10,7 @@ mod creator;
 mod runner;
 mod submitter;
 
-const VERSION: &str = "0.3.3";
+const VERSION: &str = "0.3.4";
 const AUTHOR:  &str = "Epos95";
 
 #[tokio::main]
