@@ -10,7 +10,7 @@ mod creator;
 mod runner;
 mod submitter;
 
-const VERSION: &str = "0.3.5";
+const VERSION: &str = "0.3.6";
 const AUTHOR:  &str = "Epos95";
 
 #[tokio::main]
@@ -48,7 +48,7 @@ async fn main() {
                 .value_name("FILE")))
         .get_matches();
 
-    if matches.is_present("run") {
+    if matches.subcommand_matches("run").is_some() {
 
         let r = runner::run_tests();
         match r {
@@ -82,7 +82,7 @@ async fn main() {
             },
             _ => {}
         }
-    } else if matches.is_present("new") {
+    } else if matches.subcommand_matches("new").is_some() {
         let filename: String = if let Some(ref m) = matches.subcommand_matches("new") {
             m.value_of("filename").unwrap().to_string()
         } else {
@@ -116,7 +116,7 @@ async fn main() {
             },
             _ => {}
         }
-    }  else if matches.is_present("commit") {
+    }  else if matches.subcommand_matches("commit").is_some() {
         panic!("Not implemented yet");
         #[allow(unreachable_code)] {
             let r = submitter::commit().await;
