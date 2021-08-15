@@ -8,6 +8,7 @@ use regex::Regex;
 use std::io;
 use crossterm::style::*;
 use byggis::SupportedLanguages;
+use std::time::Instant;
 
 // NOTE: Should probably split this into multiple functions for easier reading and stuff
 pub fn run_tests() -> Result<(), ByggisErrors> {
@@ -199,6 +200,9 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             }
         }
 
+        // start timing 
+        let now = Instant::now();
+
         // feed the process the input from the file
         p.stdin
             .as_mut()
@@ -215,9 +219,17 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
 
         // print out the test results
         if String::from_utf8_lossy(&o.as_ref().unwrap().stdout).replace("\r", "") == s_output {
-            println!("    Test: {}\n", "ok".green());
+            println!("    Test result: {}", "ok".green());
+            println!("     Test took {} seconds to finish.", now.elapsed().as_secs_f32());
+
+            if now.elapsed().as_secs_f32() > 1.0 {
+                println!("\n     {}: Time ran out", "Warning".yellow());
+                println!("      Your program took too long to finish and ");
+                println!("      might get rejected by kattis due to it. ");
+            }
+            println!();
         } else {
-            println!("    Test: {}", "failed".red());
+            println!("    Test result: {}", "failed".red());
 
             // handle runtime errors and pretty print them
             //  NOTE: This does not get handled by main.rs since its a 
@@ -226,7 +238,6 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             if String::from_utf8_lossy(&o.as_ref().unwrap().stderr).trim() != "" {
 
                 println!("     Error:");
-
                 for l in String::from_utf8_lossy(&o.as_ref().unwrap().stderr).trim().split("\n") {
                     println!("      {}", l.bold());
                 }
@@ -234,12 +245,11 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
                 println!();
             } else {
                 // prints output of the test
-                println!("     Output: \n{}",
-                    String::from_utf8_lossy(&o
-                        .as_ref()
-                        .unwrap()
-                        .stdout).trim().italic());
-                println!("");
+                println!("     Program output:");
+                for l in String::from_utf8_lossy(&o.as_ref().unwrap().stdout).trim().split("\n") {
+                    println!("      {}", l.bold());
+                }
+                println!();
             }
         }
     }

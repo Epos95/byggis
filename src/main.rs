@@ -19,8 +19,6 @@ async fn main() {
     // TODO: Let byggis show the problen description in the terminal
     // TODO: Write tests for a basic workflow
     // TODO: Add comments where they are needed
-    // TODO: Show the output byggis expected on error
-    // TODO: Report error if simulation runs too long
     // TODO: multiple main files of the same language
 
     let matches = App::new("Byggis")
