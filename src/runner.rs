@@ -1,14 +1,20 @@
-use std::collections::HashMap;
-use std::fs;
+use std::{
+    collections::HashMap,
+    fs,
+    process::{
+        Command,
+        Stdio,
+    },
+    io::prelude::*,
+    io,
+    time::Instant,
+};
 use serde_json;
-use std::process::{Command, Stdio};
-use std::io::prelude::*;
 use byggis::ByggisErrors;
 use regex::Regex;
-use std::io;
 use crossterm::style::*;
+
 use byggis::SupportedLanguages;
-use std::time::Instant;
 
 // NOTE: Should probably split this into multiple functions for easier reading and stuff
 pub fn run_tests() -> Result<(), ByggisErrors> {

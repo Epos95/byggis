@@ -1,14 +1,18 @@
-use std::collections::HashMap;
-use select::document::Document;
-use select::predicate::Name;
-use select::node::Node;
+use std::{
+    collections::HashMap,
+    io,
+    io::prelude::*,
+    fs,
+};
 use reqwest;
-use std::fs;
 use serde_json;
 use byggis::*;
 use crossterm::style::*;
-use std::io;
-use std::io::prelude::*;
+use select::{
+    document::Document,
+    predicate::Name,
+    node::Node,
+};
 
 pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
 
