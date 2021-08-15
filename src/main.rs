@@ -22,6 +22,7 @@ async fn main() {
     // TODO: Show the output byggis expected on error
     // TODO: Report error if simulation runs too long
     // TODO: program output testing doesnt work on windows!
+    // TODO: multiple main files of the same language
 
     let matches = App::new("Byggis")
         .version(VERSION)
