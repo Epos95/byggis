@@ -17,7 +17,7 @@ use crossterm::style::*;
 use byggis::SupportedLanguages;
 
 // NOTE: Should probably split this into multiple functions for easier reading and stuff
-pub fn run_tests() -> Result<(), ByggisErrors> {
+pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
 
     // get .byggis file to read tests from
     let dot_byggis = match fs::File::open("./.byggis") {
@@ -228,7 +228,7 @@ pub fn run_tests() -> Result<(), ByggisErrors> {
             println!("    Test result: {}", "ok".green());
             println!("     Test took {} seconds to finish.", now.elapsed().as_secs_f32());
 
-            if now.elapsed().as_secs_f32() > 1.0 {
+            if now.elapsed().as_secs_f32() > 1.0 && !test_time {
                 println!("\n     {}: Time ran out", "Warning".yellow());
                 println!("      Your program took too long to finish and ");
                 println!("      might get rejected by kattis due to it. ");

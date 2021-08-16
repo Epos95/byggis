@@ -20,7 +20,6 @@ async fn main() {
     // TODO: Write tests for a basic workflow
     // TODO: Add comments where they are needed
     // TODO: multiple main files of the same language
-    // TODO: maybe add an arg to "byggis run" that toggles time measuring
 
     let matches = App::new("Byggis")
         .version(VERSION)
@@ -29,7 +28,12 @@ async fn main() {
         .subcommand(App::new("run")
             .about("Runs tests for the selected problem")
             .version(VERSION)
-            .author(AUTHOR))
+            .author(AUTHOR)
+            .arg(Arg::new("ignore time")
+                .takes_value(false)
+                .required(false)
+                .long("ignore-time")
+                .short('t')))
         .subcommand(App::new("new")
             .about("Downloads and creates a new directory for a given kattis problem")
             .version(VERSION)
@@ -50,7 +54,9 @@ async fn main() {
 
     if matches.subcommand_matches("run").is_some() {
 
-        let r = runner::run_tests();
+        let test_time = matches.subcommand_matches("run").unwrap().is_present("ignore time");
+
+        let r = runner::run_tests(test_time);
         match r {
             Ok(_) => {
                 println!("   Tests completed.");
@@ -79,9 +85,12 @@ async fn main() {
             _ => {}
         }
     } else if matches.subcommand_matches("new").is_some() {
-        let filename: String = if let Some(ref m) = matches.subcommand_matches("new") {
-            m.value_of("filename").unwrap().to_string()
-        };
+        let filename = matches
+            .subcommand_matches("new")
+            .unwrap()
+            .value_of("filename")
+            .unwrap()
+            .to_string();
 
         let r = creator::create_new(filename).await;
 
