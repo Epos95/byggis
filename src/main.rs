@@ -68,10 +68,6 @@ async fn main() {
                 println!("   {}: Could not find a main file to test with",
                     "Error".red());
             },
-            Err(ByggisErrors::UnknownLanguage) => {
-                println!("   {}: Language not implemented",
-                    "Error".red());
-            },
             Err(ByggisErrors::CompileTimeError(e)) => {
                 println!("     Compilation error:");
 
@@ -85,9 +81,6 @@ async fn main() {
     } else if matches.subcommand_matches("new").is_some() {
         let filename: String = if let Some(ref m) = matches.subcommand_matches("new") {
             m.value_of("filename").unwrap().to_string()
-        } else {
-            println!("   {}: Somehow failed...", "Error".red());
-            panic!();
         };
 
         let r = creator::create_new(filename).await;
