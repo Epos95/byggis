@@ -9,17 +9,23 @@ use clap::{
 mod creator;
 mod runner;
 mod submitter;
+mod describer;
 
-const VERSION: &str = "0.3.6";
+const VERSION: &str = "0.3.7";
 const AUTHOR:  &str = "Epos95";
 
 #[tokio::main]
 async fn main() {
     // TODO: Implement submissions
-    // TODO: Let byggis show the problen description in the terminal
+    // TODO: Finish describer.rs
+    // TODO: Make error printouts to a impl of ByggisErrors for easy error printing
     // TODO: Write tests for a basic workflow
     // TODO: Add comments where they are needed
     // TODO: multiple main files of the same language
+    // TODO: Touch up comments in lib.rs
+    // TODO: solve creator bug when theres an uneven amount of pre tags in the problem body
+    //       do this by looking for sample tags instead and iterating over it smarterly
+
 
     let matches = App::new("Byggis")
         .version(VERSION)
@@ -43,13 +49,17 @@ async fn main() {
                 .required(true)
                 .value_name("FILE")))
         .subcommand(App::new("commit")
-            .about("Submits the selected file to kattis (not done)")
+            .about("Submits the selected file to kattis (TODO)")
             .version(VERSION)
             .author(AUTHOR)
             .arg(Arg::new("filename to submit")
                 .takes_value(true)
                 .required(false)
                 .value_name("FILE")))
+        .subcommand(App::new("describe")
+            .about("Prints the description for a kattis problem")
+            .version(VERSION)
+            .author(AUTHOR))
         .get_matches();
 
     if matches.subcommand_matches("run").is_some() {
@@ -150,5 +160,7 @@ async fn main() {
                 }
             }
         }
+    } else if matches.subcommand_matches("describe").is_some() {
+        let r = describer::describe();
     }
 }

@@ -1,5 +1,4 @@
 use std::{
-    collections::HashMap,
     fs,
     process::{
         Command,
@@ -14,7 +13,10 @@ use byggis::ByggisErrors;
 use regex::Regex;
 use crossterm::style::*;
 
-use byggis::SupportedLanguages;
+use byggis::{
+    SupportedLanguages,
+    DotByggis,
+};
 
 // NOTE: Should probably split this into multiple functions for easier reading and stuff
 pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
@@ -25,21 +27,7 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         Err(_) => { return Err(ByggisErrors::ByggisFileNotFound); },
     };
 
-    // reads and error handles tests from .byggis file
-    // TODO: rewrite how the hashmap is designed to be something akin to:
-    //      {
-    //           test_inputs : {
-    //               []
-    //           },
-    //           test_outputs : {
-    //                []
-    //           },
-    //       }
-    // to let this serialize well with serde we should prolly serialize it into 
-    // a custom struct, however this is not necesary until we work on commiting
-    // The DotByggis struct in lib.rs can be used for this 
-
-    let tests: HashMap<String, String> = match serde_json::from_reader(dot_byggis) {
+    let dot_byggis: DotByggis = match serde_json::from_reader(dot_byggis) {
         Ok(n) => n,
         Err(_) => { return Err(ByggisErrors::TestsNotFound); },
     };
@@ -165,7 +153,7 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
 
 
     // run the file against the tests
-    for (s_input, s_output) in tests {
+    for (s_input, s_output) in dot_byggis.tests {
 
         // spawn process and execute file
         let mut p;

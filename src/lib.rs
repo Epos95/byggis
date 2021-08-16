@@ -1,3 +1,12 @@
+use std::collections::HashMap;
+use serde::{Serialize, Deserialize};
+
+#[derive(Serialize, Deserialize)]
+pub struct DotByggis {
+    pub tests: HashMap<String, String>,
+    pub description: Vec<String>
+}
+
 pub enum ByggisErrors {
     NetworkError,
         // reflects errors connecting to kattis
@@ -44,7 +53,7 @@ impl SupportedLanguages {
             "python" | "py"  => Some(SupportedLanguages::Python),
             "java"           => Some(SupportedLanguages::Java),
             "haskell" | "hs" => Some(SupportedLanguages::Haskell),
-            _         => None
+            _                => None
         }
     }
 
@@ -65,6 +74,28 @@ impl SupportedLanguages {
             SupportedLanguages::Haskell => String::from("hs")
         }
     }
-
-    //pub fn get_contents()
+    pub fn get_contents(&self, name: &String) -> String {
+        match self {
+            SupportedLanguages::Python => {
+                format!("# main.py for problem: {}\n{}",
+                        name,
+                        "from sys import stdin\n\n")
+            },
+            SupportedLanguages::Rust => {
+                format!("// main.rs for problem: {}\n\n{}",
+                        name,
+                        "use std::io::{self, BufRead};\n\nfn main() {\n\tlet stdin = io::stdin();\n\n}")
+            },
+            SupportedLanguages::Java => {
+                format!("// main.java for problem: {}\nimport java.util.Scanner;\npublic class {}",
+                        name,
+                        name)
+            },
+            SupportedLanguages::Haskell => {
+                format!("-- main.hs for problem: {}\n\n{}",
+                        name,
+                        "readInput = (map read) . words\nmain = interact (writeOutput . solve . readInput)\n-- this is the solve function\nsolve = ")
+            },
+        }
+}
 }

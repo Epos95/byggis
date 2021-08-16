@@ -10,29 +10,36 @@ use byggis::*;
 use crossterm::style::*;
 use select::{
     document::Document,
-    predicate::Name,
+    predicate::{
+        Name,
+        Class,
+    },
     node::Node,
 };
 
 pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
 
     let op = get_from_string(&name).await;
-    match &op {
+    let html = match op {
         Ok(response) => {
             if response.status() == 404 {
                 return Err(ByggisErrors::ProblemNotFound);
-            } 
+            }
+            response.text().await.unwrap()
         },
         Err(_) => {
             return Err(ByggisErrors::NetworkError);
         }
-    }
+    };
 
-    // this might be a bit of a bad design since the above match statment 
-    // basically already unwraps op (also dont use unwrap) 
-    let html = op.unwrap().text().await.unwrap();
     let document = Document::from(html.as_str());
-    let hmap = get_samples(document);
+    let tests = get_samples(document.clone());
+    let description = get_description(document);
+
+    let dotbyggis = DotByggis {
+        tests,
+        description,
+    };
 
     if fs::create_dir(&name).is_err() {
         return Err(ByggisErrors::DirectoryNotCreated);
@@ -43,7 +50,7 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
         Err(_) => {return Err(ByggisErrors::ByggisFileNotCreated);},
     };
 
-    if let Err(_) = serde_json::to_writer(file, &hmap) {
+    if let Err(_) = serde_json::to_writer(file, &dotbyggis) {
         return Err(ByggisErrors::ByggisFileNotCreated);
     }
 
@@ -70,7 +77,7 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
             .get(n)
             .unwrap_or(&SupportedLanguages::Python);
 
-        let contents = get_contents(lang.clone(), name.clone());
+        let contents = lang.get_contents(&name);
 
         let mut file = match fs::File::create(&format!("{}/main.{}", name, lang.extension())) {
             Ok(n)  => n,
@@ -98,6 +105,7 @@ fn get_samples(document: Document) -> HashMap<String, String> {
     // YES this function will shit the bed if it encounters <pre> tags in any 
     // place that isnt the input/output spec but if f the question does that
     // then tbh fuck me
+    // UPDATE I AM NOW SMARTER AND THIS IS FIXABLE
 
 
     // you should play around with the select library too learn it a bit better
@@ -123,27 +131,11 @@ fn get_samples(document: Document) -> HashMap<String, String> {
     hmap
 }
 
-fn get_contents(lang: &SupportedLanguages, name: String) -> String {
-    match lang {
-        SupportedLanguages::Python => {
-            format!("# main.py for problem: {}\n{}",
-                    name,
-                    "from sys import stdin\n\n")
-        },
-        SupportedLanguages::Rust => {
-            format!("// main.rs for problem: {}\n\n{}",
-                    name,
-                    "use std::io::{self, BufRead};\n\nfn main() {\n\tlet stdin = io::stdin();\n\n}")
-        },
-        SupportedLanguages::Java => {
-            format!("// main.java for problem: {}\nimport java.util.Scanner;\npublic class {}",
-                    name,
-                    name)
-        },
-        SupportedLanguages::Haskell => {
-            format!("-- main.hs for problem: {}\n\n{}",
-                    name,
-                    "readInput = (map read) . words\nmain = interact (writeOutput . solve . readInput)\n-- this is the solve function\nsolve = ")
-        },
-    }
+fn get_description(document: Document) -> Vec<String> {
+    let node = document.find(Class("problembody")).next().unwrap();
+
+    // TODO: We need to parse the description aswell  :(
+    println!("Encountered a TODO in creator.rs::get_description");
+    
+    node.find(Name("p")).map(|x| x.text()).collect::<Vec<String>>()
 }
