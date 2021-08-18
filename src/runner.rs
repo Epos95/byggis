@@ -50,15 +50,13 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         return Err(ByggisErrors::MainNotFound);
     }
 
-
-    // get and parse the input from the user
     let mut num: i32 = 1;
+
+    // if more than one main file detected...
     if f_vec.len() > 1 {
-        // handles more than one main file
         println!("  {}: Detected more than one main file...",
             "Note".blue());
         println!("   Select main file to use:");
-
 
         // prints out the files in a nice manner
         for (i, f) in f_vec.iter().enumerate() {
@@ -67,12 +65,10 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
                 f.to_string().bold());
         }
 
-
         // read from stdin to n to be used as a option in selection process
         let mut n = String::new();
         io::stdin().read_line(&mut n).expect("Could not read from stdin");
         n.pop();
-
 
         // parse the input from n/stdin into a clean integer
         num = n.parse().unwrap_or_else(|_| {
@@ -80,7 +76,6 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
                 "Error".red());
             1
         });
-
 
         // error checking operation, defaults to first option
         if num > f_vec.len() as i32 {
@@ -99,7 +94,6 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
     match language {
         SupportedLanguages::Python => {},
         SupportedLanguages::Rust => {
-            // create a process for compiling rust file and check output
             let p = Command::new("rustc")
                 .arg("-A")
                 .arg("warnings")

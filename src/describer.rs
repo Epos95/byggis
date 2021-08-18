@@ -1,7 +1,4 @@
-use std::{
-    fs,
-};
-
+use std::fs;
 use serde_json;
 use crossterm::style::*;
 
