@@ -1,5 +1,8 @@
+pub use enum_iterator::IntoEnumIterator;
 use std::collections::HashMap;
 use serde::{Serialize, Deserialize};
+use std::fmt;
+use crossterm::style::*;
 
 #[derive(Serialize, Deserialize)]
 pub struct DotByggis {
@@ -7,37 +10,91 @@ pub struct DotByggis {
     pub description: Vec<String>
 }
 
+/// Error enum containing all the errors that can be returned from the modules
 pub enum ByggisErrors {
+    /// Reflects errors connecting to kattis
     NetworkError,
-        // reflects errors connecting to kattis
+    /// Reflects error scenario where directory could not be created
     DirectoryNotCreated,
-        // reflects error scenario where directory could not be created
+    /// Reflects error scenario where byggis file cannot be created
     ByggisFileNotCreated, 
-        // reflects error scenario where byggis file cannot be created
+    /// Reflects 404 from kattis when searching for the problem
     ProblemNotFound,
-        // reflects 404 from kattis when searching for the problem
+    /// Scenario where byggis file is not found
     ByggisFileNotFound,
-        // scenario where byggis file is not found
+    /// Scenario where the tests in the file is not found 
     TestsNotFound,
-        // scenario where the tests in the file is not found 
+    /// Reflects scenario where main file cant be found in the directory
     MainNotFound,
-        // reflects scenario where main file cant be found in the directory
+    /// Reflects scenario where the users code cant compile
     CompileTimeError(String),
-        // reflects scenario where the users code cant compile
-    UnknownLanguage,
-        // reflects scenario where the file is in a unimplemented language
+    /// Scenario where byggis cannot find a config file to read token from
     ConfigFileNotFound,
-        // scenario where byggis cannot find a config file to read token from
+    /// Scenario where kattis refuses the given token
     InvalidToken,
-        // scenario where kattis refuses the given token
-    FileReadingError,
-        // scenario where byggis cannot read from the token file
+    /// Scenario where byggis cannot create the main file
     MainFailure,
-        // scenario where byggis cannot create the main file
-
 }
 
-pub use enum_iterator::IntoEnumIterator;
+impl fmt::Display for ByggisErrors {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        let thing = match &self {
+            ByggisErrors::NetworkError => {
+                format!("   {}: Could not connect to open.kattis.com",
+                        "Error".red())
+            },
+            ByggisErrors::DirectoryNotCreated => {
+                format!("   {}: Directory could not be created",
+                    "Error".red())
+            },
+            ByggisErrors::ByggisFileNotCreated => {
+                format!("   {}: byggis file could not be created",
+                    "Error".red())
+            },
+            ByggisErrors::ProblemNotFound => {
+                format!("   {}: Could not find that problem on kattis",
+                    "Error".red())
+            }, 
+            ByggisErrors::ByggisFileNotFound => {
+                format!("   {}: Could not find byggis file in folder\n{}",
+                    "Error".red(),
+                    "    Did you run \"byggis new 'name'\"?")
+            }, 
+            ByggisErrors::TestsNotFound => {
+                format!("   {}: Could not find tests in byggis file",
+                    "Error".red())
+            },
+            ByggisErrors::MainNotFound => {
+                format!("   {}: Could not find a main file to test with",
+                    "Error".red())
+            }, 
+            ByggisErrors::CompileTimeError(s) => {
+                let mut x = format!("     Compilation error:");
+
+                for line in s.trim().split("\n") {
+                    x = format!("{}    {}\n", x, line.bold());
+                }
+                
+                format!("{}\n", x)
+            },
+            ByggisErrors::ConfigFileNotFound => {
+                format!("   {}: Could not find config file containing token\n    You can generate one with \"{}\"",
+                    "Error".red(),
+                    "Byggis generate".bold())
+            },
+            ByggisErrors::InvalidToken => {
+                format!("   {}: Invalid token",
+                    "Error".red())
+            },
+            ByggisErrors::MainFailure => {
+                format!("   {}: Could not create main file", "Error".red())
+            },
+        };
+
+        write!(f, "{}", thing)
+    }
+}
+
 #[derive(Debug, IntoEnumIterator, PartialEq)]
 pub enum SupportedLanguages {
     Rust,
@@ -97,5 +154,5 @@ impl SupportedLanguages {
                         "readInput = (map read) . words\nmain = interact (writeOutput . solve . readInput)\n-- this is the solve function\nsolve = ")
             },
         }
-}
+    }
 }
