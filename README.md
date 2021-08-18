@@ -31,14 +31,14 @@ if there are multiple main files, byggis will ask you which one to use.
 ## TODO
 - [x] Implement rust
 - [x] Better help messages
-- [ ] Description of the problem from Kattis
+- [x] Description of the problem from Kattis
 - [ ] Implement C
 - [ ] Implement C++
 - [ ] Implement submissions
 - [ ] Write tests
 
 ## Contribute
-Currently the only supported languages are python and Rust. If your prefered language is not supported, please put in a pull request.
+If your supported language is not supported, please put in a pull request.
 
 ## license
 [MIT](https://choosealicense.com/licenses/mit/)
