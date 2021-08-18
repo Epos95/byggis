@@ -22,7 +22,6 @@ async fn main() {
     // TODO: Add comments where they are needed
     // TODO: multiple main files of the same language
     // TODO: Touch up comments in lib.rs
-    // TODO: Update README
     // TODO: solve creator bug when theres an uneven amount of pre tags in the problem body
     //       do this by looking for sample tags instead and iterating over it smarterly
 
