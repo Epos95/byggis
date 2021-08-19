@@ -36,6 +36,8 @@ pub enum ByggisErrors {
     MainFailure,
 }
 
+// Maybe implement as a method for byggiserrors instead
+// byggiserror::error.display() does make alot of sense
 impl fmt::Display for ByggisErrors {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         let thing = match &self {

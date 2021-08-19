@@ -1,18 +1,19 @@
-use byggis;
-use byggis::ByggisErrors;
 use crossterm::style::*;
 use clap::{
     App, 
     Arg,
 };
 
+
 mod creator;
 mod runner;
 mod submitter;
 mod describer;
 
+
 const VERSION: &str = "0.3.7";
 const AUTHOR:  &str = "Epos95";
+
 
 #[tokio::main]
 async fn main() {
@@ -20,9 +21,7 @@ async fn main() {
     // TODO: Finish describer.rs
     // TODO: Write tests for a basic workflow
     // TODO: Add comments where they are needed
-    // TODO: multiple main files of the same language
     // TODO: Touch up comments in lib.rs
-    // TODO: Update README
     // TODO: Add options "run" that lets you specifiy alloted time
     // TODO: solve creator bug when theres an uneven amount of pre tags in the problem body
     //       do this by looking for sample tags instead and iterating over it smarterly
@@ -105,25 +104,8 @@ async fn main() {
                 Ok(_) => {
                     println!("Success!")
                 },
-                Err(ByggisErrors::NetworkError) => {
-                    println!("   {}: Could not connect to open.kattis.com",
-                        "Error".red());
-                },
-                Err(ByggisErrors::MainNotFound) => {
-                    println!("   {}: Could not find a main file to test with",
-                        "Error".red());
-                },
-                Err(ByggisErrors::ConfigFileNotFound) => {
-                    println!("   {}: Could not find config file containing token\n    You can generate one with \"{}\"",
-                        "Error".red(),
-                        "Byggis generate".bold());
-                },
-                Err(ByggisErrors::InvalidToken) => {
-                    println!("   {}: Invalid token",
-                        "Error".red());
-                },
-                _ => {
-                    panic!("Unimplemented error");
+                Err(e) => {
+                    println!("{}", e);
                 }
             }
         }
