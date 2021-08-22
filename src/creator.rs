@@ -130,5 +130,14 @@ fn get_description(document: Document) -> Vec<String> {
     // TODO: We need to parse the description here
     println!("Encountered a TODO in creator.rs::get_description");
     
-    node.find(Name("p")).map(|x| x.text()).collect::<Vec<String>>()
+    let x = node.find(Name("p")).map(|x| {
+        // remove the dollar signs
+        x.text().chars().filter(|x| x != &'$').collect::<String>()
+
+        // convert leq to proper sign
+        .replace("\\leq", "<=")
+
+    }).collect::<Vec<String>>();
+
+    x
 }
