@@ -21,7 +21,6 @@ async fn main() {
     // TODO: Finish describer.rs
     // TODO: Write tests for a basic workflow
     // TODO: Comment more things
-    // TODO: Touch up comments in lib.rs
     // TODO: Add options "run" that lets you specifiy alloted time
     // TODO: solve creator bug when theres an uneven amount of pre tags in the problem body
     //       do this by looking for sample tags instead and iterating over it smarterly
