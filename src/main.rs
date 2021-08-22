@@ -20,7 +20,7 @@ async fn main() {
     // TODO: Implement submissions
     // TODO: Finish describer.rs
     // TODO: Write tests for a basic workflow
-    // TODO: Add comments where they are needed
+    // TODO: Comment more things
     // TODO: Touch up comments in lib.rs
     // TODO: Add options "run" that lets you specifiy alloted time
     // TODO: solve creator bug when theres an uneven amount of pre tags in the problem body

@@ -101,18 +101,11 @@ async fn get_from_string(problem: &String) -> Result<reqwest::Response, reqwest:
 }
 
 fn get_samples(document: Document) -> HashMap<String, String> {
-    // you know what: 
-    // YES this function will shit the bed if it encounters <pre> tags in any 
-    // place that isnt the input/output spec but if f the question does that
-    // then tbh fuck me
-    // UPDATE I AM NOW SMARTER AND THIS IS FIXABLE
-
-
-    // you should play around with the select library too learn it a bit better
-    // rewrite according to the spec from runner.rs
     let mut hmap: HashMap<String, String> = HashMap::new();
+
     let c: Vec<Node> = document.find(Name("pre")).collect();
 
+    // This can be fixed, check TODOs in main.rs
     if c.len() % 2 != 0 {
         println!("    {}{}",
                  "BIG ERROR".red(),
@@ -134,7 +127,7 @@ fn get_samples(document: Document) -> HashMap<String, String> {
 fn get_description(document: Document) -> Vec<String> {
     let node = document.find(Class("problembody")).next().unwrap();
 
-    // TODO: We need to parse the description aswell  :(
+    // TODO: We need to parse the description here
     println!("Encountered a TODO in creator.rs::get_description");
     
     node.find(Name("p")).map(|x| x.text()).collect::<Vec<String>>()
