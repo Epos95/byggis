@@ -10,11 +10,11 @@ use byggis::*;
 use crossterm::style::*;
 use select::{
     document::Document,
+    node::Node,
     predicate::{
         Name,
         Class,
     },
-    node::Node,
 };
 
 pub async fn create_new(name: String) -> Result<String, ByggisErrors> {

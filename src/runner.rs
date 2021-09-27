@@ -1,12 +1,12 @@
 use std::{
     fs,
     io,
+    io::prelude::*,
+    time::Instant,
     process::{
         Command,
         Stdio,
     },
-    io::prelude::*,
-    time::Instant,
 };
 use serde_json;
 use byggis::ByggisErrors;
@@ -18,7 +18,7 @@ use byggis::{
     DotByggis,
 };
 
-// NOTE: Should probably split this into multiple functions for easier reading and stuff
+// TODO: Needs to split up, like what the fuck is this
 pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
 
     // get .byggis file to read tests from
