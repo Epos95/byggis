@@ -67,7 +67,7 @@ pub async fn commit() -> Result<(), ByggisErrors> {
     let problem_name = match get_problem_name() {
         Some(s) => s,
         None => {
-            println!("Could not read directory name.\nWhat is the name of the problem youre trying to submit?");
+            println!("Could not read directory name.\nWhat is the problems problem id?");
 
             let mut p = String::new();
             let mut stdin = io::stdin();
@@ -82,9 +82,10 @@ pub async fn commit() -> Result<(), ByggisErrors> {
     Ok(())
 }
 
-// be användaren om namnet på problemet om det misslyckas att läsa från directory
+/// Gets the problem id of the current problem, on failure to read it will ask the user for input.
 fn get_problem_name() -> Option<String> {
     // should return the directory name
+    // TODO: Fix this to be windows compatible/not dumb by not relying on pwd lmfao
 
     let o = match Command::new("pwd").output() {
         Ok(n) => {
@@ -99,15 +100,8 @@ fn get_problem_name() -> Option<String> {
     }
 }
 
+/// Gets kattis credentials from a specified path. Can fail.
 fn get_credentials(path: PathBuf) -> Option<(String, String)> {
-    // should try and get the credentials from the file in the path
-    // the file in the pathn *should* be a valid kattisrc file or one containing similair
-    // content, this function CAN return nonvalid credentials e.g: ("", "")
-    // later comment: if it CAN return nonvalid things shouldnt it be a result??
-
-    // this method (and how it interacts with the public semi main function) 
-    // should prolly be redone, it seems bad. it should be working tho 
-
     let config = match fs::read_to_string(path) {
         Ok(n) => n,
         Err(_) => { return None; } 
@@ -118,17 +112,18 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
 
     for line in config.split("\n") {
         if line.contains("token: ") {
-            token = line.split(" ").last().unwrap_or("").to_string();
+            token = line.split(" ").last()?.to_string();
         }
 
         if line.contains("username: ") {
-            username = line.split(" ").last().unwrap_or("").to_string();
+            username = line.split(" ").last()?.to_string();
         }
     }
 
     Some((username, token))
 }
 
+// NOTE: Shouldnt we maybe save the cookies recieved from here?
 async fn login(user: String, token: String) -> Result<reqwest::Response, reqwest::Error> {
     let client = reqwest::Client::new();
     let p = [
