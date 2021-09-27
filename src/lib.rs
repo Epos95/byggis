@@ -98,6 +98,9 @@ impl fmt::Display for ByggisErrors {
 }
 
 #[derive(Debug, IntoEnumIterator, PartialEq)]
+/// Enum describing the different kinds of supported languages.
+/// To implement a new language we just have to add things to `SupportedLanguages`
+/// and the language will be useable.
 pub enum SupportedLanguages {
     Rust,
     Java,
@@ -106,6 +109,7 @@ pub enum SupportedLanguages {
 }
  
 impl SupportedLanguages {
+    /// Create a langauge from a string.
     pub fn from_string(s: String) -> Option<Self> {
         match s.as_str() {
             "rust" | "rs"    => Some(SupportedLanguages::Rust),
@@ -116,6 +120,7 @@ impl SupportedLanguages {
         }
     }
 
+    /// Get the name of the language.
     pub fn name(&self) -> String {
         match &self {
             SupportedLanguages::Rust    => String::from("rust"),
@@ -125,6 +130,7 @@ impl SupportedLanguages {
         }
     }
 
+    /// Get the extension of the language.
     pub fn extension(&self) -> String {
         match &self {
             SupportedLanguages::Rust    => String::from("rs"),
@@ -133,6 +139,8 @@ impl SupportedLanguages {
             SupportedLanguages::Haskell => String::from("hs")
         }
     }
+
+    /// Get the file contents for a language.
     pub fn get_contents(&self, name: &String) -> String {
         match self {
             SupportedLanguages::Python => {
