@@ -46,12 +46,11 @@ pub async fn commit() -> Result<(), ByggisErrors> {
         }
     };
 
-    println!("[DEBUG]\nusername: {}\ntoken: {}", username, token);
+    println!("\n[DEBUG]\nusername: {}\ntoken: {}\n", username, token);
 
     // efter detta har vi ett (antagligen) giltigt token att använda
 
-
-    // detta är nog inte klart idfk
+    // vi behöver fortfarande behålla cookies från inloggningen
     let headers = match login(username, token).await {
         Ok(n) => {
             if n.status().is_success() {
@@ -64,7 +63,6 @@ pub async fn commit() -> Result<(), ByggisErrors> {
         },
         Err(_) => { return Err(ByggisErrors::NetworkError); }
     };
-
 
     let problem_name = match get_problem_name() {
         Some(s) => s,
@@ -116,15 +114,15 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     };
 
     let mut username: String = "".to_string();
-    let mut token: String    = "".to_string();
+    let mut token:    String = "".to_string();
 
-    for line in config.split('\n') {
+    for line in config.split("\n") {
         if line.contains("token: ") {
-            token = line.split(' ').last().unwrap_or("").to_string();
+            token = line.split(" ").last().unwrap_or("").to_string();
         }
 
         if line.contains("username: ") {
-            username = line.split(' ').last().unwrap_or("").to_string();
+            username = line.split(" ").last().unwrap_or("").to_string();
         }
     }
 
@@ -133,8 +131,14 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
 
 async fn login(user: String, token: String) -> Result<reqwest::Response, reqwest::Error> {
     let client = reqwest::Client::new();
-    let p = [("user", user), ("script", "true".to_string()), ("token", token)];
+    let p = [
+        ("user", user),
+        ("script", "true".to_string()),
+        ("token", token)
+    ];
+
     client.post("https://open.kattis.com/login")
         .form(&p)
-        .send().await
+        .send()
+        .await
 }

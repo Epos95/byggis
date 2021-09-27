@@ -75,8 +75,9 @@ async fn main() {
                 println!("{}", e);
             }
         }
+
     } else if matches.subcommand_matches("new").is_some() {
-        let filename = matches
+        let filename: String = matches
             .subcommand_matches("new")
             .unwrap()
             .value_of("filename")
@@ -93,22 +94,21 @@ async fn main() {
             },
             Err(e) => {
                 println!("{}", e);
-            },
-        }
-    }  else if matches.subcommand_matches("commit").is_some() {
-        panic!("Not implemented yet");
-        #[allow(unreachable_code)] {
-            let r = submitter::commit().await;
-
-            match r {
-                Ok(_) => {
-                    println!("Success!")
-                },
-                Err(e) => {
-                    println!("{}", e);
-                }
             }
         }
+
+    }  else if matches.subcommand_matches("commit").is_some() {
+        let r = submitter::commit().await;
+
+        match r {
+            Ok(_) => {
+                println!("Success!")
+            },
+            Err(e) => {
+                println!("{}", e);
+            }
+        }
+
     } else if matches.subcommand_matches("describe").is_some() {
         let r = describer::describe();
         if let Err(x) = r {

@@ -1,11 +1,11 @@
 use std::{
     fs,
+    io,
     process::{
         Command,
         Stdio,
     },
     io::prelude::*,
-    io,
     time::Instant,
 };
 use serde_json;
@@ -50,7 +50,7 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         return Err(ByggisErrors::MainNotFound);
     }
 
-    let mut num: i32 = 1;
+    let mut file_index: i32 = 1;
 
     // if more than one main file detected...
     if f_vec.len() > 1 {
@@ -71,24 +71,24 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         n.pop();
 
         // parse the input from n/stdin into a clean integer
-        num = n.parse().unwrap_or_else(|_| {
+        file_index = n.parse().unwrap_or_else(|_| {
             println!("    {}: Could not convert to int, defaulting to first option.",
                 "Error".red());
             1
         });
 
         // error checking operation, defaults to first option
-        if num > f_vec.len() as i32 {
-            println!("    {}: Number not an option, defaulting to first option",
+        if file_index > f_vec.len() as i32 {
+            println!("    {}: File_Indexber not an option, defaulting to first option",
                 "Error".red());
-            num = 1;
+            file_index = 1;
         }
     }
 
     // gets the file name from the vector of names based on the inputed index
-    let main_file: &String = &f_vec[(num-1) as usize];
+    let main_file: &String = &f_vec[(file_index-1) as usize];
 
-    let language = SupportedLanguages::from_string(main_file.split(".").last().unwrap().to_string()).unwrap();
+    let language: SupportedLanguages = SupportedLanguages::from_string(main_file.split(".").last().unwrap().to_string()).unwrap();
 
     // get the used language and compile/setup for running the file
     match language {
@@ -203,11 +203,14 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
             println!("     {}", s.trim().italic());
         }
 
-        let o = &p.wait_with_output();
+        let o = p.wait_with_output();
+        let s = String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
+        let output_string = s.trim();
 
         // print out the test results
-        if String::from_utf8_lossy(&o.as_ref().unwrap().stdout).replace("\r", "") == s_output {
+        if output_string.replace("\r", "") == s_output {
             println!("    Test result: {}", "ok".green());
+
             println!("     Test took {} seconds to finish.", now.elapsed().as_secs_f32());
 
             if now.elapsed().as_secs_f32() > 1.0 && !test_time {
@@ -223,22 +226,26 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
             //  NOTE: This does not get handled by main.rs since its a 
             //        recoverable error, e.g we still want the program to finish 
             //        safely after this happens
-            if String::from_utf8_lossy(&o.as_ref().unwrap().stderr).trim() != "" {
 
+            if output_string != "" {
                 println!("     Error:");
-                for l in String::from_utf8_lossy(&o.as_ref().unwrap().stderr).trim().split("\n") {
-                    println!("      {}", l.bold());
-                }
-
-                println!();
             } else {
-                // prints output of the test
-                println!("     Program output:");
-                for l in String::from_utf8_lossy(&o.as_ref().unwrap().stdout).trim().split("\n") {
-                    println!("      {}", l.bold());
+                println!("     Test took {} seconds to finish.", now.elapsed().as_secs_f32());
+
+                if now.elapsed().as_secs_f32() > 1.0 && !test_time {
+                    println!("\n     {}: Time ran out", "Warning".yellow());
+                    println!("      Your program took too long to finish and ");
+                    println!("      might get rejected by kattis due to it. ");
                 }
                 println!();
+                println!("     Program output:");
             }
+
+            for l in output_string.split("\n") {
+                println!("      {}", l.bold());
+            }
+
+            println!();
         }
     }
 
