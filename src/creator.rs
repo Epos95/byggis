@@ -17,6 +17,13 @@ use select::{
     },
 };
 
+/// ## Entry function for creating a new byggis directory.
+/// ```
+/// pub async fn create_new(name: String) -> Result<String, ByggisErrors>
+/// ```
+/// 
+/// Creates a new byggis directory with a specified problem id (`name`).
+/// Returns either the problem id (`name`) or a `ByggisErrors` telling where it all went horribly wrong.
 pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
 
     let op = get_from_string(&name).await;
@@ -93,6 +100,11 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
     Ok(name)
 }
 
+
+/// ### Gets the page of a specified kattis problem.
+/// ```
+/// async fn get_from_string(problem: &String) -> Result<reqwest::Response, reqwest::Error>
+/// ```
 async fn get_from_string(problem: &String) -> Result<reqwest::Response, reqwest::Error> {
     let url = format!("https://open.kattis.com/problems/{}", problem);
     let res = reqwest::get(&url);
@@ -100,6 +112,10 @@ async fn get_from_string(problem: &String) -> Result<reqwest::Response, reqwest:
     res.await
 }
 
+/// ### Parses a HTML document and gets the sample inputs/outputs.
+/// ```
+/// fn get_samples(document: Document) -> HashMap<String, String>
+/// ``` 
 fn get_samples(document: Document) -> HashMap<String, String> {
     let mut hmap: HashMap<String, String> = HashMap::new();
 
@@ -124,19 +140,24 @@ fn get_samples(document: Document) -> HashMap<String, String> {
     hmap
 }
 
+/// ### Gets the description of a problem from a specified HTML document.
+/// ```
+/// fn get_description(document: Document) -> Vec<String> 
+/// ```
+/// This function should prepare a description for parsing by the describer module by interpreting various signs and beautifying the description.
 fn get_description(document: Document) -> Vec<String> {
     let node = document.find(Class("problembody")).next().unwrap();
 
     // TODO: We need to parse the description here
     println!("Encountered a TODO in creator.rs::get_description");
-    
+
     let x = node.find(Name("p")).map(|x| {
-        // remove the dollar signs
-        x.text().chars().filter(|x| x != &'$').collect::<String>()
+        x.text().chars()
+            // remove the dollar signs
+            .filter(|x| x != &'$').collect::<String>()
 
-        // convert leq to proper sign
-        .replace("\\leq", "<=")
-
+            // convert leq to proper sign
+            .replace("\\leq", "<=")
     }).collect::<Vec<String>>();
 
     x

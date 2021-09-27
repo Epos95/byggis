@@ -17,14 +17,7 @@ const AUTHOR:  &str = "Epos95";
 
 #[tokio::main]
 async fn main() {
-    // TODO: Implement submissions
-    // TODO: Finish describer.rs
-    // TODO: Write tests for a basic workflow
-    // TODO: Comment more things
-    // TODO: Add options "run" that lets you specifiy alloted time
-    // TODO: solve creator bug when theres an uneven amount of pre tags in the problem body
-    //       do this by looking for sample tags instead and iterating over it smarterly
-
+    // for TODOs see the trello board: https://trello.com/b/fZ8BSsJs/byggis
 
     let matches = App::new("Byggis")
         .version(VERSION)
@@ -35,6 +28,7 @@ async fn main() {
             .version(VERSION)
             .author(AUTHOR)
             .arg(Arg::new("ignore time")
+                .about("Stops byggis from warning the user about timeouts on successfull tests")
                 .takes_value(false)
                 .required(false)
                 .long("ignore-time")

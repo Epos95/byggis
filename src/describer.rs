@@ -9,18 +9,18 @@ use byggis::{
 
 pub fn describe() -> Result<(), ByggisErrors> {
     // get .byggis file to read tests from
-    let dot_byggis = match fs::File::open("./.byggis") {
+    let raw_dot_byggis = match fs::File::open("./.byggis") {
         Ok(n) => n,
         Err(_) => { return Err(ByggisErrors::ByggisFileNotFound); },
     };
 
-    let dot_byggis: DotByggis = match serde_json::from_reader(dot_byggis) {
+    let dot_byggis_content: DotByggis = match serde_json::from_reader(raw_dot_byggis) {
         Ok(n) => n,
         Err(_) => { return Err(ByggisErrors::TestsNotFound); },
     };
     
     println!(" Description:");
-    for line in dot_byggis.description {
+    for line in dot_byggis_content.description {
         println!("  {}\n", line);
     }
 
