@@ -204,9 +204,23 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         }
 
         let o = p.wait_with_output();
-        let s = String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
-        let output_string = s.trim();
+        let stdout = String::from_utf8_lossy(&o.as_ref().unwrap().stdout);
+        let stderr = String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
 
+        let output_string = stdout.trim();
+        let stderr_string = stderr.trim();
+
+
+        // NEW IMPLEMENTATION
+        if !stderr_string.is_empty() {
+            // Runtime error found!
+        } else if output_string.replace("\r", "") == s_output {
+            // success
+        } else {
+            // wrong answer
+        }
+
+        // REPLACE ALL THIS
         // print out the test results
         if output_string.replace("\r", "") == s_output {
             println!("    Test result: {}", "ok".green());
@@ -227,7 +241,7 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
             //        recoverable error, e.g we still want the program to finish 
             //        safely after this happens
 
-            if output_string != "" {
+            if stderr != "" {
                 println!("     Error:");
             } else {
                 println!("     Test took {} seconds to finish.", now.elapsed().as_secs_f32());
