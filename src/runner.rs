@@ -206,6 +206,7 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         let o = p.wait_with_output();
         let s = String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
         let output_string = s.trim();
+        println!("output_string: {:?}", output_string);
 
         // print out the test results
         if output_string.replace("\r", "") == s_output {

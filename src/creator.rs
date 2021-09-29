@@ -158,6 +158,8 @@ fn get_description(document: Document) -> Vec<String> {
 
             // convert leq to proper sign
             .replace("\\leq", "<=")
+
+            
     }).collect::<Vec<String>>();
 
     x
