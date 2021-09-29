@@ -123,7 +123,6 @@ fn get_credentials(path: PathBuf) -> Option<(String, String)> {
     Some((username, token))
 }
 
-// NOTE: Shouldnt we maybe save the cookies recieved from here?
 async fn login(user: String, token: String) -> Result<reqwest::Response, reqwest::Error> {
     let client = reqwest::Client::new();
     let p = [

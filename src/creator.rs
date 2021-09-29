@@ -1,8 +1,8 @@
 use std::{
-    collections::HashMap,
+    fs,
     io,
     io::prelude::*,
-    fs,
+    collections::HashMap,
 };
 use reqwest;
 use serde_json;

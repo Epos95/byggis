@@ -11,10 +11,10 @@ use std::process::{
 /// To implement a new language we just have to add things to `SupportedLanguages`
 /// and the language will be useable.
 pub enum SupportedLanguages {
-    Rust,
-    Java,
     Python,
+    Rust,
     Haskell,
+    Java,
 }
  
 impl SupportedLanguages {
