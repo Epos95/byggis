@@ -1,6 +1,5 @@
 use std::fs;
 use serde_json;
-use crossterm::style::*;
 
 use byggis::{
     DotByggis,

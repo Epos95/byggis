@@ -8,6 +8,7 @@ use reqwest;
 use serde_json;
 use byggis::*;
 use crossterm::style::*;
+use crate::supported_languages::SupportedLanguages;
 use select::{
     document::Document,
     node::Node,

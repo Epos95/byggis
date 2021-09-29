@@ -5,6 +5,7 @@ use clap::{
 };
 
 
+pub mod supported_languages;
 mod creator;
 mod runner;
 mod submitter;

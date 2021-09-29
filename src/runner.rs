@@ -3,20 +3,13 @@ use std::{
     io,
     io::prelude::*,
     time::Instant,
-    process::{
-        Command,
-        Stdio,
-    },
 };
 use serde_json;
 use byggis::ByggisErrors;
 use regex::Regex;
 use crossterm::style::*;
-
-use byggis::{
-    SupportedLanguages,
-    DotByggis,
-};
+use byggis::DotByggis;
+use crate::supported_languages::SupportedLanguages;
 
 // TODO: Needs to split up, like what the fuck is this
 pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
@@ -71,7 +64,7 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         n.pop();
 
         // parse the input from n/stdin into a clean integer
-        file_index = n.parse().unwrap_or_else(|_| {
+        file_index = n.replace("\n","").replace("\r", "").parse().unwrap_or_else(|_| {
             println!("    {}: Could not convert to int, defaulting to first option.",
                 "Error".red());
             1
@@ -91,102 +84,13 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
     let language: SupportedLanguages = SupportedLanguages::from_string(main_file.split(".").last().unwrap().to_string()).unwrap();
 
     // get the used language and compile/setup for running the file
-    match language {
-        SupportedLanguages::Python => {},
-        SupportedLanguages::Rust => {
-            let p = Command::new("rustc")
-                .arg("-A")
-                .arg("warnings")
-                .arg("main.rs")
-                .stdin( Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-            let o = &p.wait_with_output();
-            let stderr = &String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
-
-            if stderr != "" {
-                return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
-            }
-        },
-        SupportedLanguages::Java => {
-            let p = Command::new("javac")
-                .arg("main.java")
-                .stdin( Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-            let o = &p.wait_with_output();
-            let stderr = &String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
-
-            if stderr != "" {
-                return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
-            }
-        },
-        SupportedLanguages::Haskell => {
-            let p = Command::new("ghc")
-                .arg("main.hs")
-                .stdin( Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap();
-
-            let o = &p.wait_with_output();
-            let stderr = &String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
-
-            if stderr != "" {
-                return Err(ByggisErrors::CompileTimeError(stderr.trim().to_string()))
-            }
-        }
-    };
-
+    language.compile()?;
 
     // run the file against the tests
     for (s_input, s_output) in dot_byggis.tests {
 
         // spawn process and execute file
-        let mut p;
-        match language {
-            SupportedLanguages::Rust => {
-                p = Command::new("./main")
-                    .stdin( Stdio::piped())
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::piped())
-                    .spawn()
-                    .unwrap();
-            },
-            SupportedLanguages::Python => {
-                p = Command::new("python")
-                    .arg("main.py")
-                    .stdin( Stdio::piped())
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::piped())
-                    .spawn()
-                    .unwrap();
-            }, 
-            SupportedLanguages::Java => {
-                p = Command::new("java")
-                    .arg("main.class")
-                    .stdin( Stdio::piped())
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::piped())
-                    .spawn()
-                    .unwrap();
-            }, 
-            SupportedLanguages::Haskell => {
-                p = Command::new("./main")
-                    .stdin( Stdio::piped())
-                    .stdout(Stdio::piped())
-                    .stderr(Stdio::piped())
-                    .spawn()
-                    .unwrap();
-            }
-        }
+        let mut p = language.get_process();
 
         // start timing 
         let now = Instant::now();
@@ -198,71 +102,58 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
             .write(s_input.as_bytes())
             .unwrap();
 
-        println!("   Test case:");
-        for s in s_input.split("\n") {
-            println!("     {}", s.trim().italic());
-        }
-
+        // gets the stderr and stdout of the program so we can test them.
         let o = p.wait_with_output();
-<<<<<<< HEAD
-        let s = String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
-        let output_string = s.trim();
-        println!("output_string: {:?}", output_string);
-=======
         let stdout = String::from_utf8_lossy(&o.as_ref().unwrap().stdout);
         let stderr = String::from_utf8_lossy(&o.as_ref().unwrap().stderr);
->>>>>>> cf2dd78ca2ce0dfbc4053ef2474b4f7f34242c45
-
         let output_string = stdout.trim();
         let stderr_string = stderr.trim();
 
+        if output_string.replace("\r", "") == s_output && stderr_string.is_empty() {
+            // Tests completed and ok!
+            println!("  Test result: {}", "ok".green());
 
-        // NEW IMPLEMENTATION
-        if !stderr_string.is_empty() {
-            // Runtime error found!
-        } else if output_string.replace("\r", "") == s_output {
-            // success
-        } else {
-            // wrong answer
-        }
+            println!("   Test case:");
+            for s in s_input.split("\n") {
+                println!("     {}", s.trim().italic());
+            }
 
-        // REPLACE ALL THIS
-        // print out the test results
-        if output_string.replace("\r", "") == s_output {
-            println!("    Test result: {}", "ok".green());
-
-            println!("     Test took {} seconds to finish.", now.elapsed().as_secs_f32());
+            println!("    Test took {} seconds to finish.", now.elapsed().as_secs_f32());
 
             if now.elapsed().as_secs_f32() > 1.0 && !test_time {
-                println!("\n     {}: Time ran out", "Warning".yellow());
-                println!("      Your program took too long to finish and ");
-                println!("      might get rejected by kattis due to it. ");
+                println!("\n   {}: Time ran out", "Warning".yellow());
+                println!("    Your program took too long to finish and ");
+                println!("    might get rejected by kattis due to it. ");
+            }
+            println!();
+
+        } else if !stderr_string.is_empty() {
+            // Runtime error found!
+            println!("  Test result: {}", "failed".red());
+
+            println!("   Test case:");
+            for s in s_input.split("\n") {
+                println!("     {}", s.trim().italic());
+            }
+
+            println!("    Runtime error:");
+            for l in stderr_string.split("\n") {
+                println!("      {}", l.bold());
             }
             println!();
         } else {
-            println!("    Test result: {}", "failed".red());
+            // wrong answer
+            println!("  Test result: {}", "failed".red());
 
-            // handle runtime errors and pretty print them
-            //  NOTE: This does not get handled by main.rs since its a 
-            //        recoverable error, e.g we still want the program to finish 
-            //        safely after this happens
-
-            if stderr != "" {
-                println!("     Error:");
-            } else {
-                println!("     Test took {} seconds to finish.", now.elapsed().as_secs_f32());
-
-                if now.elapsed().as_secs_f32() > 1.0 && !test_time {
-                    println!("\n     {}: Time ran out", "Warning".yellow());
-                    println!("      Your program took too long to finish and ");
-                    println!("      might get rejected by kattis due to it. ");
-                }
-                println!();
-                println!("     Program output:");
+            println!("   Test case:");
+            for s in s_input.split("\n") {
+                println!("     {}", s.trim().italic());
             }
 
+            println!("   Program output: ");
+
             for l in output_string.split("\n") {
-                println!("      {}", l.bold());
+                println!("     {}", l.bold());
             }
 
             println!();

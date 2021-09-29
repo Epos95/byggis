@@ -1,1 +1,1 @@
-{"tests":{"hello" : "hello"},"description":["There is no input for this problem.","Output should contain one line, containing the string “Hello\n    World!”."]}
+{"tests":{"hello": "hello"},"description":["There is no input for this problem.","Output should contain one line, containing the string “Hello\n    World!”."]}
