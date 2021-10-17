@@ -1,20 +1,14 @@
+use clap::{App, Arg};
 use crossterm::style::*;
-use clap::{
-    App, 
-    Arg,
-};
 
-
-pub mod supported_languages;
 mod creator;
+mod describer;
 mod runner;
 mod submitter;
-mod describer;
-
+pub mod supported_languages;
 
 const VERSION: &str = "0.3.7";
-const AUTHOR:  &str = "Epos95";
-
+const AUTHOR: &str = "Epos95";
 
 #[tokio::main]
 async fn main() {
@@ -57,19 +51,20 @@ async fn main() {
         .get_matches();
 
     if matches.subcommand_matches("run").is_some() {
-
-        let test_time = matches.subcommand_matches("run").unwrap().is_present("ignore time");
+        let test_time = matches
+            .subcommand_matches("run")
+            .unwrap()
+            .is_present("ignore time");
 
         let r = runner::run_tests(test_time);
         match r {
             Ok(_) => {
                 println!("   Tests completed.");
-            },
+            }
             Err(e) => {
                 println!("{}", e);
             }
         }
-
     } else if matches.subcommand_matches("new").is_some() {
         let filename: String = matches
             .subcommand_matches("new")
@@ -82,27 +77,27 @@ async fn main() {
 
         match r {
             Ok(n) => {
-                println!("   {} new byggis folder \"{}\"",
+                println!(
+                    "   {} new byggis folder \"{}\"",
                     "Created".green(),
-                    n.bold());
-            },
+                    n.bold()
+                );
+            }
             Err(e) => {
                 println!("{}", e);
             }
         }
-
-    }  else if matches.subcommand_matches("commit").is_some() {
+    } else if matches.subcommand_matches("commit").is_some() {
         let r = submitter::commit().await;
 
         match r {
             Ok(_) => {
                 println!("Success!")
-            },
+            }
             Err(e) => {
                 println!("{}", e);
             }
         }
-
     } else if matches.subcommand_matches("describe").is_some() {
         let r = describer::describe();
         if let Err(x) = r {
