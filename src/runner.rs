@@ -4,7 +4,7 @@ use byggis::DotByggis;
 use crossterm::style::*;
 use regex::Regex;
 use serde_json;
-use std::{fs, io, io::prelude::*, time::Instant};
+use std::{fs, io::prelude::*, time::Instant};
 
 // TODO: Needs to split up, like what the fuck is this
 pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {

@@ -84,13 +84,27 @@ impl SupportedLanguages {
                 .stderr(Stdio::piped())
                 .spawn()
                 .unwrap(),
-            SupportedLanguages::Python => Command::new("python")
-                .arg("main.py")
-                .stdin(Stdio::piped())
-                .stdout(Stdio::piped())
-                .stderr(Stdio::piped())
-                .spawn()
-                .unwrap(),
+            // The python one can panic if the system uses python3 instead of python
+            SupportedLanguages::Python =>{
+
+                if let Ok(r) = Command::new("python")
+                    .arg("main.py")
+                    .stdin(Stdio::piped())
+                    .stdout(Stdio::piped())
+                    .stderr(Stdio::piped())
+                    .spawn() {
+                        r
+                } else { // dumbfix for the people who doesnt know how to alias or install python propperly
+                    Command::new("python3")
+                        .arg("main.py")
+                        .stdin(Stdio::piped())
+                        .stdout(Stdio::piped())
+                        .stderr(Stdio::piped())
+                        .spawn().expect("This error probably occurs because you dont have `python` nor ´python3´ installed, if not something is very wrong")
+                }
+
+
+            },
             SupportedLanguages::Java => Command::new("java")
                 .arg("main.class")
                 .stdin(Stdio::piped())
@@ -172,9 +186,9 @@ impl SupportedLanguages {
 
     pub fn guess(&self) -> String {
         match self {
-            SupportedLanguages::Python => "Python 3",
-            SupportedLanguages::Rust => "Rust",
-            SupportedLanguages::Java => "Java",
+            SupportedLanguages::Python  => "Python 3",
+            SupportedLanguages::Rust    => "Rust",
+            SupportedLanguages::Java    => "Java",
             SupportedLanguages::Haskell => "Haskell",
         }
         .to_string()
