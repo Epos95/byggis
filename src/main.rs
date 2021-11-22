@@ -4,7 +4,6 @@ use crossterm::style::*;
 mod creator;
 mod describer;
 mod runner;
-mod submitter;
 pub mod supported_languages;
 
 const VERSION: &str = "0.3.7";
@@ -12,8 +11,6 @@ const AUTHOR: &str = "Epos95";
 
 #[tokio::main]
 async fn main() {
-    // for TODOs see the trello board: https://trello.com/b/fZ8BSsJs/byggis
-
     let matches = App::new("Byggis")
         .version(VERSION)
         .author(AUTHOR)
@@ -36,16 +33,8 @@ async fn main() {
                 .takes_value(true)
                 .required(true)
                 .value_name("FILE")))
-        .subcommand(App::new("commit")
-            .about("Submits the selected file to kattis (TODO)")
-            .version(VERSION)
-            .author(AUTHOR)
-            .arg(Arg::new("filename to submit")
-                .takes_value(true)
-                .required(false)
-                .value_name("FILE")))
         .subcommand(App::new("describe")
-            .about("Prints the description for a kattis problem")
+            .about("Prints the description for a kattis problem (BETA)")
             .version(VERSION)
             .author(AUTHOR))
         .get_matches();
@@ -82,17 +71,6 @@ async fn main() {
                     "Created".green(),
                     n.bold()
                 );
-            }
-            Err(e) => {
-                println!("{}", e);
-            }
-        }
-    } else if matches.subcommand_matches("commit").is_some() {
-        let r = submitter::submit().await;
-
-        match r {
-            Ok(_) => {
-                println!("Success!")
             }
             Err(e) => {
                 println!("{}", e);

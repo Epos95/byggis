@@ -19,7 +19,7 @@ pub fn describe() -> Result<(), ByggisErrors> {
         }
     };
 
-    println!(" Description:");
+    println!(" Problem description:");
     for line in dot_byggis_content.description {
         println!("  {}\n", line);
     }
