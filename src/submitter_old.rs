@@ -1,19 +1,18 @@
-
 // this file should contain all the code needed to replicate submitting from the terminal
 use dirs::home_dir;
 use std::collections::HashMap;
 use std::fs;
 use std::io;
 use std::path::PathBuf;
-
-use pyo3::prelude::*;
-use pyo3::types::PyModule;
+use std::process::Command;
 
 use std::path::Path;
 
 use regex::Regex;
 
 use byggis::ByggisErrors;
+
+use reqwest::{cookie::Cookie, header::HeaderValue, Method, Request, Url};
 
 use crate::supported_languages::SupportedLanguages;
 
@@ -24,7 +23,7 @@ use crate::supported_languages::SupportedLanguages;
  * Handle result from the submission
 */
 
-pub async fn submit() -> Result<(), ByggisErrors> {
+pub async fn commit() -> Result<(), ByggisErrors> {
     // first try to read from "path" to see if it exists etc
 
     // tries to read config from path
@@ -39,7 +38,7 @@ pub async fn submit() -> Result<(), ByggisErrors> {
             println!("Could not find credentials in that location.\nEnter path to file: ");
 
             let mut p = String::new();
-            let stdin = io::stdin();
+            let mut stdin = io::stdin();
             stdin.read_line(&mut p).unwrap();
             p.pop();
 
@@ -112,6 +111,8 @@ pub async fn submit() -> Result<(), ByggisErrors> {
         .collect::<Vec<String>>();
 
     // build the data hashmap
+    // im pretty sure we can just add the things that in "submit.py" goes in the body
+    // into the data hashmap and it will be fiiiiiine
     let form_data: HashMap<&str, &str> = vec![
         ("submit", "true"),
         ("submit_ctr", "2"),
@@ -121,44 +122,28 @@ pub async fn submit() -> Result<(), ByggisErrors> {
         ("script", "true"),
     ].iter().map(|x| *x).collect();
 
-    // use pyo3 to use the requests library natively cuz reqwest is kinda bad(ly documented)
-    Python::with_gil(|py| {
-        let thing = PyModule::from_code(py, r#"
-def submit(data, cookies, file):
-    import requests
-    print(cookies)
-    import os
+    // create request
+    let client = reqwest::Client::new();
+    let req = client
+        .post("https://open.kattis.com/submit") // kattis link here
+        .form(&form_data) // "data" from submit.py goes here, takes a hashmap
+        .header(cookie_pair[0].as_str(), cookie_pair[1].clone())
+        .header("User-Agent", "kattis-cli-submit")
+        .build()
+        .unwrap();
 
-    headers = {'User-Agent': 'kattis-cli-submit'}
+    println!("{:#?}", req);
 
-    sub_files = []
-    with open(file) as sub_file:
-        sub_files.append(('sub_file[]',
-                          (os.path.basename(file),
-                           sub_file.read(),
-                           'application/octet-stream')))
+    let r = client.execute(req);
+    dbg!(r.await.unwrap());
 
-    #r = requests.post(
-            #"https://open.kattis.com/",
-            #data=data,
-            #cookies={cookies[0], cookies[1]},
-            #files=sub_files,
-            #headers=headers)
-
-    #print(r)
-
-"#, "test.py", "test").unwrap();
-
-
-        thing.call_method1("submit", (form_data, cookie_pair, main_file)).unwrap();
-    });
-
+    // lmfao just use pyo3 to call a reworked submit.py
 
 
     Ok(())
 }
 
-/// Gets kattis credentials from a specified path. Can panic.
+/// Gets kattis credentials from a specified path. Can fail.
 fn get_credentials(path: PathBuf) -> Option<(String, String)> {
 
     let config = match fs::read_to_string(path) {
@@ -198,5 +183,3 @@ async fn login(user: String, token: String) -> Result<reqwest::Response, reqwest
         .send()
         .await
 }
-
-//fn

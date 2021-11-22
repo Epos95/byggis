@@ -12,14 +12,17 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-reqwest = { version = "0.10", features = ["json", "cookies"] }
-tokio = { version = "0.2", features = ["full"] }
-select = "0.5.0"
-serde_json = "1.0"
-serde = "1.0"
-regex = "1"
-dirs = "3.0.1"
-clap = "3.0.0-beta.2"
-crossterm = "0.19.0"
+reqwest       = { version = "0.11.6", features = ["json", "cookies"] }
+tokio         = { version = "1.12.0", features = ["full"] }
+select        = "0.5.0"
+serde_json    = "1.0"
+serde         = "1.0"
+regex         = "1"
+dirs          = "3.0.1"
+clap          = "3.0.0-beta.2"
+crossterm     = "0.19.0"
 enum-iterator = "0.7.0"
 
+[dependencies.pyo3]
+version = "0.14.5"
+features = ["auto-initialize"]

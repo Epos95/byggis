@@ -102,8 +102,6 @@ impl SupportedLanguages {
                         .stderr(Stdio::piped())
                         .spawn().expect("This error probably occurs because you dont have `python` nor ´python3´ installed, if not something is very wrong")
                 }
-
-
             },
             SupportedLanguages::Java => Command::new("java")
                 .arg("main.class")

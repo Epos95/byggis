@@ -88,7 +88,7 @@ async fn main() {
             }
         }
     } else if matches.subcommand_matches("commit").is_some() {
-        let r = submitter::commit().await;
+        let r = submitter::submit().await;
 
         match r {
             Ok(_) => {
