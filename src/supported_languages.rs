@@ -84,25 +84,13 @@ impl SupportedLanguages {
                 .stderr(Stdio::piped())
                 .spawn()
                 .unwrap(),
-            // The python one can panic if the system uses python3 instead of python
-            SupportedLanguages::Python =>{
-
-                if let Ok(r) = Command::new("python")
+            SupportedLanguages::Python => Command::new("python")
                     .arg("main.py")
                     .stdin(Stdio::piped())
                     .stdout(Stdio::piped())
                     .stderr(Stdio::piped())
-                    .spawn() {
-                        r
-                } else { // dumbfix for the people who doesnt know how to alias or install python propperly
-                    Command::new("python3")
-                        .arg("main.py")
-                        .stdin(Stdio::piped())
-                        .stdout(Stdio::piped())
-                        .stderr(Stdio::piped())
-                        .spawn().expect("This error probably occurs because you dont have `python` nor ´python3´ installed, if not something is very wrong")
-                }
-            },
+                    .spawn()
+                    .expect("Failed to spawn python process!\tIf this happens you probably dont have 'python' availible, try aliasing 'python3' to alias or make sure python is installed propperly."),
             SupportedLanguages::Java => Command::new("java")
                 .arg("main.class")
                 .stdin(Stdio::piped())
@@ -119,7 +107,8 @@ impl SupportedLanguages {
         }
     }
 
-    /// Compiles the selected language.
+    /// Compiles the selected language according to how
+    /// kattis will compile it when testing the code.
     pub fn compile(&self) -> Result<(), ByggisErrors> {
         match self {
             SupportedLanguages::Python => Ok(()),
