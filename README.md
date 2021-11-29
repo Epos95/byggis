@@ -9,7 +9,7 @@ $ cargo install byggis
 ```
 
 ## Usage 
-Start a new kattis solution: 
+### Start a new kattis solution: 
 ```bash
 $ byggis new <PROBLEM ID> 
 ```
@@ -29,13 +29,13 @@ Supported languages:
 
 Byggis will then create a new folder named `<PROBLEM ID>` where your main file exists.
 
-To test your code against the test cases from kattis just do:
+### To test your code against the test cases from kattis just do:
 ```bash
 $ byggis run
 ```
 if there are multiple main files, byggis will ask you which one to use.
 
-To view your problems description with byggis use:
+### To view your problems description with byggis use:
 ```bash
 $ byggis describe
 ```
