@@ -57,7 +57,7 @@ pub fn run_tests(test_time: bool) -> Result<(), ByggisErrors> {
         let output_string = stdout.trim();
         let stderr_string = stderr.trim();
 
-        if output_string.replace("\r", "") == s_output && stderr_string.is_empty() {
+        if output_string.replace("\r", "") == s_output.replace("\n", "") && stderr_string.is_empty() {
             // Tests completed and ok!
             println!("  Test result: {}", "ok".green());
 

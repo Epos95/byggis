@@ -6,12 +6,12 @@ mod describer;
 mod runner;
 pub mod supported_languages;
 
-const VERSION: &str = "0.3.7";
+const VERSION: &str = "0.3.9";
 const AUTHOR: &str = "Epos95";
 
 #[tokio::main]
 async fn main() {
-    let matches = App::new("Byggis")
+    let mut app = App::new("Byggis")
         .version(VERSION)
         .author(AUTHOR)
         .about("A build and testing system for kattis problems")
@@ -36,8 +36,8 @@ async fn main() {
         .subcommand(App::new("describe")
             .about("Prints the description for a kattis problem (BETA)")
             .version(VERSION)
-            .author(AUTHOR))
-        .get_matches();
+            .author(AUTHOR));
+    let matches = app.clone().get_matches();
 
     if matches.subcommand_matches("run").is_some() {
         let test_time = matches
@@ -81,5 +81,7 @@ async fn main() {
         if let Err(x) = r {
             println!("{}", x);
         }
+    } else {
+        app.print_help().unwrap();
     }
 }
