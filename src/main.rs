@@ -20,7 +20,6 @@ async fn main() {
             .version(VERSION)
             .author(AUTHOR)
             .arg(Arg::new("ignore time")
-                .about("Stops byggis from warning the user about timeouts on successfull tests")
                 .takes_value(false)
                 .required(false)
                 .long("ignore-time")
