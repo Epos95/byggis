@@ -63,7 +63,7 @@ impl SupportedLanguages {
             }
             SupportedLanguages::Java => {
                 format!(
-                    "// main.java for problem: {}\nimport java.util.Scanner;\npublic class {}",
+                    "// main.java for problem: {}\nimport java.util.Scanner;\npublic class {} {{\n\n}}",
                     name, name
                 )
             }
