@@ -1,4 +1,4 @@
-use clap::{Command, command, arg};
+use clap::{arg, command, Command};
 use crossterm::style::*;
 
 mod creator;
@@ -14,21 +14,14 @@ async fn main() {
         .subcommand(
             Command::new("run")
                 .about("Runs tests for the selected problem")
-                .arg(
-                    arg!(-t --timeout "Whether or not to ignore timeout when running testes")
-                )
+                .arg(arg!(-t --timeout "Whether or not to ignore timeout when running testes")),
         )
         .subcommand(
             Command::new("new")
                 .about("Downloads and creates a new directory for a given kattis problem")
-                .arg(
-                    arg!(<FILE>)
-                )
+                .arg(arg!(<FILE>)),
         )
-        .subcommand(
-            Command::new("describe")
-                .about("Prints the description for a kattis problem")
-        )
+        .subcommand(Command::new("describe").about("Prints the description for a kattis problem"))
         .get_matches();
 
     if matches.subcommand_matches("run").is_some() {
@@ -73,5 +66,5 @@ async fn main() {
         if let Err(x) = r {
             println!("{}", x);
         }
-    } 
+    }
 }

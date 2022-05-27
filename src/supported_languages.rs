@@ -17,9 +17,9 @@ impl SupportedLanguages {
     /// Create a langauge from a string.
     pub fn from_string(s: String) -> Option<Self> {
         match s.as_str() {
-            "rust"    | "rs" => Some(SupportedLanguages::Rust),
-            "python"  | "py" => Some(SupportedLanguages::Python),
-            "java"           => Some(SupportedLanguages::Java),
+            "rust" | "rs" => Some(SupportedLanguages::Rust),
+            "python" | "py" => Some(SupportedLanguages::Python),
+            "java" => Some(SupportedLanguages::Java),
             "haskell" | "hs" => Some(SupportedLanguages::Haskell),
             _ => None,
         }
@@ -28,9 +28,9 @@ impl SupportedLanguages {
     /// Get the name of the language.
     pub fn name(&self) -> String {
         match &self {
-            SupportedLanguages::Rust    => String::from("rust"),
-            SupportedLanguages::Python  => String::from("python"),
-            SupportedLanguages::Java    => String::from("java"),
+            SupportedLanguages::Rust => String::from("rust"),
+            SupportedLanguages::Python => String::from("python"),
+            SupportedLanguages::Java => String::from("java"),
             SupportedLanguages::Haskell => String::from("haskell"),
         }
     }
@@ -38,9 +38,9 @@ impl SupportedLanguages {
     /// Get the extension of the language.
     pub fn extension(&self) -> String {
         match &self {
-            SupportedLanguages::Rust    => String::from("rs"),
-            SupportedLanguages::Python  => String::from("py"),
-            SupportedLanguages::Java    => String::from("java"),
+            SupportedLanguages::Rust => String::from("rs"),
+            SupportedLanguages::Python => String::from("py"),
+            SupportedLanguages::Java => String::from("java"),
             SupportedLanguages::Haskell => String::from("hs"),
         }
     }
@@ -173,9 +173,9 @@ impl SupportedLanguages {
 
     pub fn guess(&self) -> String {
         match self {
-            SupportedLanguages::Python  => "Python 3",
-            SupportedLanguages::Rust    => "Rust",
-            SupportedLanguages::Java    => "Java",
+            SupportedLanguages::Python => "Python 3",
+            SupportedLanguages::Rust => "Rust",
+            SupportedLanguages::Java => "Java",
             SupportedLanguages::Haskell => "Haskell",
         }
         .to_string()
