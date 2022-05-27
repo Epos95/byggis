@@ -47,7 +47,7 @@ This will print the problems description in the terminal and reduce the need to 
 	- [ ] send request with file
 	- [ ] read response html doc to get the results from kattis
 - [ ] rewrite webscraping things to use [scraper]("https://docs.rs/scraper/latest/scraper/")
-	- [ ] rewrite [creator.rs](src/creator.rs)
+	- [x] rewrite [creator.rs](src/creator.rs)
 	- [ ] implement response reading for file uploading with scraper
 - [ ] Rewrite [ByggisErrors](src/lib.rs) to use proper error enum functionalites from "rust for rustaceans".
 - [x] Update the clap version

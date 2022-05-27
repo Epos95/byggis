@@ -2,11 +2,7 @@ use crate::supported_languages::SupportedLanguages;
 use byggis::*;
 use crossterm::style::*;
 use reqwest;
-use select::{
-    document::Document,
-    node::Node,
-    predicate::{Class, Name},
-};
+use scraper::{Html, Selector};
 use serde_json;
 use std::{collections::HashMap, fs, io, io::prelude::*};
 
@@ -31,7 +27,7 @@ pub async fn create_new(name: String) -> Result<String, ByggisErrors> {
         }
     };
 
-    let document = Document::from(html.as_str());
+    let document = Html::parse_document(html.as_str());
     let tests = get_samples(document.clone());
     let description = get_description(document);
 
@@ -105,15 +101,22 @@ async fn get_from_string(problem: &String) -> Result<reqwest::Response, reqwest:
 
 /// ### Parses a HTML document and gets the sample inputs/outputs.
 /// ```
-/// fn get_samples(document: Document) -> HashMap<String, String>
+/// fn get_samples(document: Html) -> HashMap<String, String>
 /// ```
-fn get_samples(document: Document) -> HashMap<String, String> {
+fn get_samples(document: Html) -> HashMap<String, String> {
     let mut hmap: HashMap<String, String> = HashMap::new();
 
-    let c: Vec<Node> = document.find(Name("pre")).collect();
+    // should result in:
+    // "tests":{"9\n-13\n":"4\n","10\n6\n":"1\n"}
+
+    let selector = Selector::parse("pre").unwrap();
+    let samples = document
+        .select(&selector)
+        .map(|r| r.inner_html())
+        .collect::<Vec<String>>();
 
     // This can be fixed, check TODOs in main.rs
-    if c.len() % 2 != 0 {
+    if samples.len() % 2 != 0 {
         println!(
             "    {}{}",
             "BIG ERROR".red(),
@@ -121,12 +124,12 @@ fn get_samples(document: Document) -> HashMap<String, String> {
                   which caused the webscraping part to shit the bed.\n Do not use \
                   byggis with this problem."
         );
-        panic!("Oopsie woopsie, we did a fucky wucky. We are working wevy hard to fix this error");
+        panic!();
     }
 
     let mut counter = 1;
-    for thing in c.iter().step_by(2) {
-        hmap.insert(thing.text(), c[counter].text());
+    for thing in samples.iter().step_by(2) {
+        hmap.insert((*(thing.clone())).to_string(), samples[counter].clone());
         counter += 2;
     }
 
@@ -135,27 +138,32 @@ fn get_samples(document: Document) -> HashMap<String, String> {
 
 /// ### Gets the description of a problem from a specified HTML document.
 /// ```
-/// fn get_description(document: Document) -> Vec<String>
+/// fn get_description(document: Html) -> Vec<String>
 /// ```
 /// This function should prepare a description for parsing by the describer module by interpreting various signs and beautifying the description.
-fn get_description(document: Document) -> Vec<String> {
-    let node = document.find(Class("problembody")).next().unwrap();
+fn get_description(document: Html) -> Vec<String> {
+    let s = Selector::parse(r#"div[class="problembody""#).unwrap();
+    let mut samples = document.select(&s);
+    let s = Selector::parse("p").unwrap();
 
-    // TODO: We need to parse the description here
-    println!("Encountered a TODO in creator.rs::get_description");
+    samples
+        .next()
+        .unwrap()
+        .select(&s)
+        .map(|thing| {
+            let re = regex::Regex::new(r"\s+").unwrap();
 
-    let x = node
-        .find(Name("p"))
-        .map(|x| {
-            x.text()
-                .chars()
-                // remove the dollar signs
-                .filter(|x| x != &'$')
-                .collect::<String>()
-                // convert leq to proper sign
+            let e = thing
+                .inner_html()
+                .replace("\t", "")
+                .replace("\n", "")
+                .replace("<span class=\"tex2jax_process\">$", "")
+                .replace("$</span>", "");
+
+            re.replace_all(&e, " ")
                 .replace("\\leq", "<=")
+                .replace("\\not", "!")
+                .replace("\\le", "<=")
         })
-        .collect::<Vec<String>>();
-
-    x
+        .collect()
 }
