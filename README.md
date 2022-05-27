@@ -50,7 +50,7 @@ This will print the problems description in the terminal and reduce the need to 
 	- [ ] rewrite [creator.rs](src/creator.rs)
 	- [ ] implement response reading for fileuploading with scraper
 - [ ] Rewrite [ByggisErrors](src/lib.rs) to use proper error enum functionalites from "rust for rustaceans.
-- [ ] Update the clap version
+- [x] Update the clap version
 
 
 ## TODO
